@@ -1,0 +1,43 @@
+{
+  "name": "@petesmithofficial/source-hero",
+  "version": "0.1.0",
+  "description": "A customizable React source-code hero with an interactive project workbench.",
+  "type": "module",
+  "private": false,
+  "license": "MIT",
+  "sideEffects": [
+    "src/styles.css",
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "src/styles.css",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./src/styles.css"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 8788",
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "preview": "vite preview --host 0.0.0.0 --port 8788",
+    "typecheck": "tsc --noEmit",
+    "verify": "npm run typecheck && npm run build && node scripts/verify.mjs"
+  },
+  "peerDependencies": {
+    "react": ">=18.2.0 <20",
+    "react-dom": ">=18.2.0 <20"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}

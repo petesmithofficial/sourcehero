@@ -1,0 +1,547 @@
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FocusEvent,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
+import type { SourceHeroProject } from "../types";
+
+const wheelDeltaMode = {
+  line: 1,
+  page: 2,
+} as const;
+const wheelLineHeight = 18;
+const smoothScrollEase = 0.26;
+const smoothScrollSnapDistance = 0.35;
+
+function clampScrollTop(nextScrollTop: number, maxScrollTop: number) {
+  return Math.min(Math.max(nextScrollTop, 0), maxScrollTop);
+}
+
+function normalizeWheelDelta(event: WheelEvent, list: HTMLOListElement) {
+  if (event.deltaMode === wheelDeltaMode.line) {
+    return event.deltaY * wheelLineHeight;
+  }
+
+  if (event.deltaMode === wheelDeltaMode.page) {
+    return event.deltaY * list.clientHeight;
+  }
+
+  return event.deltaY;
+}
+
+export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
+  const [activeProjectName, setActiveProjectName] = useState(projects[0]?.name ?? "");
+  const [previewedProjectName, setPreviewedProjectName] = useState<string | null>(null);
+  const [isWorkbenchEngaged, setIsWorkbenchEngaged] = useState(false);
+  const [isWorkbenchTracking, setIsWorkbenchTracking] = useState(false);
+  const artifactRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLOListElement>(null);
+  const motionFrame = useRef<number | null>(null);
+  const scrollFrame = useRef<number | null>(null);
+  const targetScrollTop = useRef(0);
+  const pendingMotionPoint = useRef<{ clientX: number; clientY: number } | null>(null);
+  const pendingPreviewPoint = useRef<{ clientX: number; clientY: number } | null>(null);
+  const previewFrame = useRef<number | null>(null);
+  const previewedProjectNameRef = useRef<string | null>(null);
+  const prefersReducedMotionRef = useRef(false);
+  const isKeyboardFocusRef = useRef(false);
+  const rowRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  const activeProjectIndex = useMemo(
+    () => Math.max(0, projects.findIndex((item) => item.name === activeProjectName)),
+    [activeProjectName, projects],
+  );
+  const activeProject = useMemo(
+    () => projects.find((item) => item.name === activeProjectName) ?? projects[0],
+    [activeProjectName, projects],
+  );
+
+  const previewProject = useCallback((nextProjectName: string | null) => {
+    if (previewedProjectNameRef.current === nextProjectName) {
+      return;
+    }
+
+    previewedProjectNameRef.current = nextProjectName;
+    setPreviewedProjectName(nextProjectName);
+  }, []);
+
+  const cancelSmoothProjectScroll = useCallback(() => {
+    if (scrollFrame.current !== null) {
+      window.cancelAnimationFrame(scrollFrame.current);
+      scrollFrame.current = null;
+    }
+
+    targetScrollTop.current = listRef.current?.scrollTop ?? 0;
+  }, []);
+
+  const activateProject = useCallback(
+    (index: number, shouldScroll = false) => {
+      const nextProject = projects[index];
+
+      if (!nextProject) {
+        return;
+      }
+
+      setActiveProjectName(nextProject.name);
+      previewProject(null);
+
+      if (shouldScroll) {
+        cancelSmoothProjectScroll();
+        rowRefs.current[index]?.scrollIntoView({ block: "nearest", behavior: "auto" });
+        targetScrollTop.current = listRef.current?.scrollTop ?? 0;
+        rowRefs.current[index]?.focus({ preventScroll: true });
+      }
+    },
+    [cancelSmoothProjectScroll, previewProject, projects],
+  );
+
+  const animateProjectScroll = useCallback(() => {
+    const list = listRef.current;
+
+    if (!list) {
+      scrollFrame.current = null;
+      return;
+    }
+
+    const distance = targetScrollTop.current - list.scrollTop;
+
+    if (Math.abs(distance) <= smoothScrollSnapDistance) {
+      list.scrollTop = targetScrollTop.current;
+      scrollFrame.current = null;
+      return;
+    }
+
+    list.scrollTop += distance * smoothScrollEase;
+    scrollFrame.current = window.requestAnimationFrame(animateProjectScroll);
+  }, []);
+
+  const scrollProjectList = useCallback((event: WheelEvent) => {
+    const list = listRef.current;
+
+    if (!list) {
+      return false;
+    }
+
+    const maxScrollTop = list.scrollHeight - list.clientHeight;
+
+    if (maxScrollTop <= 0) {
+      return false;
+    }
+
+    const baseScrollTop = scrollFrame.current === null ? list.scrollTop : targetScrollTop.current;
+    const nextScrollTop = clampScrollTop(baseScrollTop + normalizeWheelDelta(event, list), maxScrollTop);
+
+    targetScrollTop.current = nextScrollTop;
+
+    if (prefersReducedMotionRef.current) {
+      list.scrollTop = nextScrollTop;
+      return true;
+    }
+
+    if (scrollFrame.current === null) {
+      scrollFrame.current = window.requestAnimationFrame(animateProjectScroll);
+    }
+
+    return true;
+  }, [animateProjectScroll]);
+
+  useEffect(() => {
+    const target = artifactRef.current;
+
+    if (!target) {
+      return;
+    }
+
+    const handleWheel = (event: WheelEvent) => {
+      if (!scrollProjectList(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    target.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      target.removeEventListener("wheel", handleWheel);
+    };
+  }, [scrollProjectList]);
+
+  const cancelPendingPreview = useCallback(() => {
+    if (previewFrame.current !== null) {
+      window.cancelAnimationFrame(previewFrame.current);
+      previewFrame.current = null;
+    }
+
+    pendingPreviewPoint.current = null;
+  }, []);
+
+  const resetWorkbenchMotion = useCallback(() => {
+    if (motionFrame.current !== null) {
+      window.cancelAnimationFrame(motionFrame.current);
+      motionFrame.current = null;
+    }
+
+    pendingMotionPoint.current = null;
+
+    const artifact = artifactRef.current;
+
+    if (!artifact) {
+      return;
+    }
+
+    artifact.style.removeProperty("--workbench-rotate-x");
+    artifact.style.removeProperty("--workbench-rotate-y");
+    artifact.style.removeProperty("--workbench-rotate-z");
+    artifact.style.removeProperty("--workbench-shift-x");
+    artifact.style.removeProperty("--workbench-shift-y");
+  }, []);
+
+  const setWorkbenchMotionTarget = useCallback((clientX: number, clientY: number) => {
+    if (prefersReducedMotionRef.current) {
+      resetWorkbenchMotion();
+      return;
+    }
+
+    pendingMotionPoint.current = { clientX, clientY };
+
+    if (motionFrame.current !== null) {
+      return;
+    }
+
+    motionFrame.current = window.requestAnimationFrame(() => {
+      const artifact = artifactRef.current;
+      const point = pendingMotionPoint.current;
+
+      motionFrame.current = null;
+      pendingMotionPoint.current = null;
+
+      if (!artifact || !point) {
+        return;
+      }
+
+      const x = point.clientX / window.innerWidth - 0.5;
+      const y = point.clientY / window.innerHeight - 0.5;
+      const rotateX = -y * 13;
+      const rotateY = x * 16;
+      const rotateZ = x * 0.72;
+      const shiftX = x * 18;
+      const shiftY = y * 16;
+
+      artifact.style.setProperty("--workbench-rotate-x", `${rotateX.toFixed(2)}deg`);
+      artifact.style.setProperty("--workbench-rotate-y", `${rotateY.toFixed(2)}deg`);
+      artifact.style.setProperty("--workbench-rotate-z", `${rotateZ.toFixed(2)}deg`);
+      artifact.style.setProperty("--workbench-shift-x", `${shiftX.toFixed(2)}px`);
+      artifact.style.setProperty("--workbench-shift-y", `${shiftY.toFixed(2)}px`);
+    });
+  }, [resetWorkbenchMotion]);
+
+  useEffect(() => {
+    const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const syncReducedMotionPreference = () => {
+      prefersReducedMotionRef.current = reducedMotionQuery.matches;
+
+      if (reducedMotionQuery.matches) {
+        resetWorkbenchMotion();
+      }
+    };
+
+    syncReducedMotionPreference();
+    reducedMotionQuery.addEventListener("change", syncReducedMotionPreference);
+
+    return () => {
+      reducedMotionQuery.removeEventListener("change", syncReducedMotionPreference);
+    };
+  }, [resetWorkbenchMotion]);
+
+  useEffect(
+    () => () => {
+      cancelPendingPreview();
+      cancelSmoothProjectScroll();
+      resetWorkbenchMotion();
+    },
+    [cancelPendingPreview, cancelSmoothProjectScroll, resetWorkbenchMotion],
+  );
+
+  const registerRow = useCallback(
+    (index: number) => (node: HTMLButtonElement | null) => {
+      rowRefs.current[index] = node;
+    },
+    [],
+  );
+
+  const isPointInsideWorkbenchZone = useCallback((clientX: number, clientY: number) => {
+    const artifact = artifactRef.current;
+
+    if (!artifact) {
+      return false;
+    }
+
+    const rect = artifact.getBoundingClientRect();
+    const pauseDeadband = 24;
+
+    return (
+      clientX >= rect.left - pauseDeadband &&
+      clientX <= rect.right + pauseDeadband &&
+      clientY >= rect.top - pauseDeadband &&
+      clientY <= rect.bottom + pauseDeadband
+    );
+  }, []);
+
+  useEffect(() => {
+    const handleWindowKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (["ArrowDown", "ArrowUp", "End", "Home", "Tab"].includes(event.key)) {
+        isKeyboardFocusRef.current = true;
+      }
+    };
+
+    const handleWindowPointerDown = () => {
+      isKeyboardFocusRef.current = false;
+    };
+
+    const handleWindowPointerMove = (event: globalThis.PointerEvent) => {
+      if (event.pointerType === "touch") {
+        return;
+      }
+
+      if (prefersReducedMotionRef.current) {
+        setIsWorkbenchTracking(false);
+        setIsWorkbenchEngaged(isPointInsideWorkbenchZone(event.clientX, event.clientY));
+        return;
+      }
+
+      if (isKeyboardFocusRef.current && artifactRef.current?.contains(document.activeElement)) {
+        setIsWorkbenchEngaged(true);
+        return;
+      }
+
+      if (isPointInsideWorkbenchZone(event.clientX, event.clientY)) {
+        setIsWorkbenchEngaged(true);
+        setIsWorkbenchTracking(false);
+        return;
+      }
+
+      setIsWorkbenchEngaged(false);
+      setIsWorkbenchTracking(true);
+      setWorkbenchMotionTarget(event.clientX, event.clientY);
+    };
+
+    window.addEventListener("keydown", handleWindowKeyDown, { passive: true });
+    window.addEventListener("pointerdown", handleWindowPointerDown, { passive: true });
+    window.addEventListener("pointermove", handleWindowPointerMove, { passive: true });
+
+    return () => {
+      window.removeEventListener("keydown", handleWindowKeyDown);
+      window.removeEventListener("pointerdown", handleWindowPointerDown);
+      window.removeEventListener("pointermove", handleWindowPointerMove);
+    };
+  }, [isPointInsideWorkbenchZone, setWorkbenchMotionTarget]);
+
+  const resolveProjectIndexAtPoint = useCallback(
+    (clientX: number, clientY: number) => {
+      const list = listRef.current;
+      const currentProjectName = previewedProjectNameRef.current;
+
+      if (!list) {
+        return null;
+      }
+
+      const listRect = list.getBoundingClientRect();
+      const listDeadband = 8;
+
+      if (
+        clientX < listRect.left - listDeadband ||
+        clientX > listRect.right + listDeadband ||
+        clientY < listRect.top - listDeadband ||
+        clientY > listRect.bottom + listDeadband
+      ) {
+        return null;
+      }
+
+      const directRowIndex = rowRefs.current.findIndex((row) => {
+        if (!row) {
+          return false;
+        }
+
+        const rowRect = row.getBoundingClientRect();
+        return clientY >= rowRect.top && clientY <= rowRect.bottom;
+      });
+
+      if (directRowIndex >= 0) {
+        return directRowIndex;
+      }
+
+      if (currentProjectName) {
+        const currentProjectIndex = projects.findIndex((item) => item.name === currentProjectName);
+        const currentRow = rowRefs.current[currentProjectIndex];
+
+        if (currentRow) {
+          const rowRect = currentRow.getBoundingClientRect();
+          const rowDeadband = 10;
+
+          if (clientY >= rowRect.top - rowDeadband && clientY <= rowRect.bottom + rowDeadband) {
+            return currentProjectIndex;
+          }
+        }
+      }
+
+      return currentProjectName ? projects.findIndex((item) => item.name === currentProjectName) : null;
+    },
+    [projects],
+  );
+
+  const previewProjectAtPoint = useCallback(
+    (clientX: number, clientY: number) => {
+      const nextProjectIndex = resolveProjectIndexAtPoint(clientX, clientY);
+      const nextProjectName = nextProjectIndex === null || nextProjectIndex < 0 ? null : projects[nextProjectIndex]?.name ?? null;
+
+      previewProject(nextProjectName);
+    },
+    [previewProject, projects, resolveProjectIndexAtPoint],
+  );
+
+  const schedulePreviewProjectAtPoint = useCallback(
+    (clientX: number, clientY: number) => {
+      pendingPreviewPoint.current = { clientX, clientY };
+
+      if (previewFrame.current !== null) {
+        return;
+      }
+
+      previewFrame.current = window.requestAnimationFrame(() => {
+        const point = pendingPreviewPoint.current;
+
+        previewFrame.current = null;
+        pendingPreviewPoint.current = null;
+
+        if (point) {
+          previewProjectAtPoint(point.clientX, point.clientY);
+        }
+      });
+    },
+    [previewProjectAtPoint],
+  );
+
+  const handleWorkbenchBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      cancelPendingPreview();
+      isKeyboardFocusRef.current = false;
+      setIsWorkbenchEngaged(false);
+      previewProject(null);
+    }
+  }, [cancelPendingPreview, previewProject]);
+
+  const handleWorkbenchFocus = useCallback(() => {
+    if (isKeyboardFocusRef.current) {
+      setIsWorkbenchEngaged(true);
+      setIsWorkbenchTracking(false);
+    }
+  }, []);
+
+  const handleWorkbenchPointerLeave = useCallback((event: PointerEvent<HTMLDivElement>) => {
+    cancelPendingPreview();
+    setIsWorkbenchEngaged(false);
+    setIsWorkbenchTracking(true);
+    setWorkbenchMotionTarget(event.clientX, event.clientY);
+    previewProject(null);
+  }, [cancelPendingPreview, previewProject, setWorkbenchMotionTarget]);
+
+  const handleWorkbenchPointerEnter = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === "touch") {
+        return;
+      }
+
+      setIsWorkbenchEngaged(true);
+      setIsWorkbenchTracking(false);
+      schedulePreviewProjectAtPoint(event.clientX, event.clientY);
+    },
+    [schedulePreviewProjectAtPoint],
+  );
+
+  const handleWorkbenchPointerMove = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType === "touch") {
+        return;
+      }
+
+      setIsWorkbenchEngaged(true);
+      setIsWorkbenchTracking(false);
+      schedulePreviewProjectAtPoint(event.clientX, event.clientY);
+    },
+    [schedulePreviewProjectAtPoint],
+  );
+
+  const handleWorkbenchKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      isKeyboardFocusRef.current = true;
+      setIsWorkbenchEngaged(true);
+      setIsWorkbenchTracking(false);
+
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        activateProject(Math.min(activeProjectIndex + 1, projects.length - 1), true);
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        activateProject(Math.max(activeProjectIndex - 1, 0), true);
+      }
+
+      if (event.key === "Home") {
+        event.preventDefault();
+        activateProject(0, true);
+      }
+
+      if (event.key === "End") {
+        event.preventDefault();
+        activateProject(projects.length - 1, true);
+      }
+    },
+    [activateProject, activeProjectIndex, projects.length],
+  );
+
+  const handleProjectListClick = useCallback(
+    (event: MouseEvent<HTMLOListElement>) => {
+      isKeyboardFocusRef.current = false;
+
+      if (event.target instanceof Element && event.target.closest("[data-project-index]")) {
+        return;
+      }
+
+      const nextProjectIndex = resolveProjectIndexAtPoint(event.clientX, event.clientY);
+
+      if (nextProjectIndex === null || nextProjectIndex < 0) {
+        return;
+      }
+
+      activateProject(nextProjectIndex);
+    },
+    [activateProject, resolveProjectIndexAtPoint],
+  );
+
+  return {
+    activeProject,
+    artifactRef,
+    handleProjectListClick,
+    handleWorkbenchBlur,
+    handleWorkbenchFocus,
+    handleWorkbenchKeyDown,
+    handleWorkbenchPointerEnter,
+    handleWorkbenchPointerLeave,
+    handleWorkbenchPointerMove,
+    isWorkbenchEngaged,
+    isWorkbenchTracking,
+    listRef,
+    previewedProjectName,
+    registerRow,
+    selectProject: activateProject,
+  };
+}
