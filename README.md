@@ -5,7 +5,7 @@ A self-contained React hero component for public source-code pages. It renders t
 ## Install
 
 ```sh
-npm install @petesmithofficial/source-hero
+npm install https://github.com/petesmithofficial/source-hero/archive/main.tar.gz
 ```
 
 ```tsx
