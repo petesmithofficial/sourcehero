@@ -8,5 +8,5 @@
     "rootDir": "src",
     "sourceMap": true
   },
-  "include": ["src/index.ts", "src/SourceHero.tsx", "src/components/**/*.tsx", "src/hooks/**/*.ts", "src/types.ts"]
+  "include": ["src/index.ts", "src/ShowcaseHero.tsx", "src/components/**/*.tsx", "src/hooks/**/*.ts", "src/types.ts"]
 }

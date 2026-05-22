@@ -1,9 +1,9 @@
 import { type FocusEvent, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
-import type { SourceHeroProject } from "../types";
-export declare function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]): {
-    activeProject: SourceHeroProject;
+import type { ShowcaseHeroItem } from "../types";
+export declare function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]): {
+    activeItem: ShowcaseHeroItem;
     artifactRef: import("react").RefObject<HTMLDivElement | null>;
-    handleProjectListClick: (event: MouseEvent<HTMLOListElement>) => void;
+    handleItemListClick: (event: MouseEvent<HTMLOListElement>) => void;
     handleWorkbenchBlur: (event: FocusEvent<HTMLDivElement>) => void;
     handleWorkbenchFocus: () => void;
     handleWorkbenchKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
@@ -13,8 +13,8 @@ export declare function useSourceHeroWorkbench(projects: readonly SourceHeroProj
     isWorkbenchEngaged: boolean;
     isWorkbenchTracking: boolean;
     listRef: import("react").RefObject<HTMLOListElement | null>;
-    previewedProjectName: string | null;
+    previewedItemName: string | null;
     registerRow: (index: number) => (node: HTMLButtonElement | null) => void;
-    selectProject: (index: number, shouldScroll?: boolean) => void;
+    selectItem: (index: number, shouldScroll?: boolean) => void;
 };
-//# sourceMappingURL=useSourceHeroWorkbench.d.ts.map
+//# sourceMappingURL=useShowcaseHeroWorkbench.d.ts.map

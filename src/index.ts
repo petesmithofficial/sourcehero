@@ -1,11 +1,12 @@
-export { SourceHero } from "./SourceHero";
+export { ShowcaseHero } from "./ShowcaseHero";
 export type {
-  SourceHeroAction,
-  SourceHeroActionVariant,
-  SourceHeroContent,
-  SourceHeroOrbitTile,
-  SourceHeroProject,
-  SourceHeroProjectDestination,
-  SourceHeroProps,
-  SourceHeroWorkbench,
+  ShowcaseHeroAction,
+  ShowcaseHeroActionVariant,
+  ShowcaseHeroContent,
+  ShowcaseHeroItem,
+  ShowcaseHeroItemDestination,
+  ShowcaseHeroItemDetail,
+  ShowcaseHeroOrbitTile,
+  ShowcaseHeroProps,
+  ShowcaseHeroWorkbench,
 } from "./types";

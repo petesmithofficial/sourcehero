@@ -1,75 +1,85 @@
-# source-hero
+# sourcehero
 
-A self-contained React hero component for public source-code pages. It renders the hero, orbit labels, action links, and an interactive project workbench from typed props.
+`sourcehero` is a small React package that exports `ShowcaseHero`: a reusable hero section with orbit labels, action links, and an interactive showcase workbench.
+
+The component is intentionally data-driven. It can present products, case studies, talks, writing, demos, downloads, technical references, or any other selected set of work.
 
 ## Install
 
 ```sh
-npm install https://github.com/petesmithofficial/source-hero/archive/main.tar.gz
+npm install https://github.com/petesmithofficial/sourcehero/archive/main.tar.gz
 ```
 
 ```tsx
-import { SourceHero, type SourceHeroProps } from "@petesmithofficial/source-hero";
-import "@petesmithofficial/source-hero/styles.css";
+import { ShowcaseHero, type ShowcaseHeroProps } from "@petesmithofficial/sourcehero";
+import "@petesmithofficial/sourcehero/styles.css";
 
-const hero: SourceHeroProps = {
+const hero: ShowcaseHeroProps = {
   actions: [
-    { href: "https://github.com/petesmithofficial", label: "Open GitHub", target: "_blank", rel: "noopener noreferrer" },
-    { href: "#work", label: "View work", variant: "secondary" },
+    { href: "#showcase", label: "View showcase" },
+    { href: "/contact", label: "Contact", variant: "secondary" },
   ],
   content: {
-    detail: "Projects, constraints, and source code in one place.",
-    eyebrow: "Public engineering",
-    name: "Pete Smith",
-    statement: "Software that holds up in practice.",
+    detail: "Selected work, demos, and notes in one focused opening section.",
+    eyebrow: "Portfolio system",
+    name: "ShowcaseHero",
+    statement: "A flexible hero for public work.",
   },
-  orbitTiles: [
-    { label: "{ }" },
-    { label: "TS" },
-    { label: "API" },
-    { label: "UI" },
-  ],
+  orbitTiles: [{ label: "UI" }, { label: "API" }, { label: "DOC" }],
   workbench: {
-    caption: "Public repos, constraints included.",
-    id: "work",
-    projects: [
+    caption: "One hero. Any curated set of work.",
+    id: "showcase",
+    items: [
       {
         destination: {
-          href: "https://github.com/petesmithofficial/source-hero",
-          label: "Open repo ->",
+          href: "https://example.com/case-study",
+          label: "Open case study ->",
           rel: "noopener noreferrer",
           target: "_blank",
-          type: "repo",
+          type: "case study",
         },
-        implementation: "Typed React props and scoped CSS.",
-        metadata: ["TypeScript", "repo"],
-        name: "source-hero",
-        scope: "Reusable hero component extracted from petesmithofficial.",
-        signal: "component",
-        slug: "source-hero",
-        summary: "customizable hero package",
+        details: [
+          { label: "Context", value: "Launch story for a focused product workflow." },
+          { label: "Format", value: "Outcome, screenshots, technical notes, and next steps." },
+        ],
+        metadata: ["product", "case study"],
+        name: "Launch Brief",
+        signal: "case study",
+        slug: "launch-brief",
+        summary: "product launch story",
       },
     ],
-    tags: ["typed props", "source-first", "responsive"],
-    title: "public projects",
+    listLabel: "Selectable showcase items",
+    selectedLabel: "selected item",
+    tags: ["typed props", "responsive", "themeable"],
+    title: "selected work",
   },
 };
 
 export function Page() {
-  return <SourceHero {...hero} />;
+  return <ShowcaseHero {...hero} />;
 }
 ```
 
 ## Props
 
-`SourceHero` is controlled through a single `SourceHeroProps` object:
+`ShowcaseHero` is controlled through a single `ShowcaseHeroProps` object:
 
 - `content`: eyebrow, name, statement, and detail copy.
 - `actions`: primary or secondary hero links.
 - `orbitTiles`: optional floating labels. The first four tiles get default positions.
-- `workbench`: optional project list with project metadata, evidence, signal text, and destination links.
+- `workbench`: optional interactive index with `items`, item metadata, arbitrary detail rows, signal text, tags, and destination links.
 
-The stylesheet is scoped under `.source-hero` and includes responsive and reduced-motion handling. You can override colors and spacing with CSS custom properties on the component root.
+Each showcase item uses neutral fields:
+
+- `name`: the visible item title.
+- `summary`: the short row description.
+- `details`: optional label/value rows for anything you want to explain.
+- `metadata`: optional chips such as technology, medium, status, audience, or destination type.
+- `signal`: a compact status/category label.
+- `destination`: optional link with caller-controlled label, target, rel, and type.
+
+The stylesheet is scoped under `.showcase-hero` and includes responsive and reduced-motion handling. You can override colors and spacing with CSS custom properties on the component root.
 
 ## Local Demo
 
@@ -84,3 +94,7 @@ The demo runs on [http://localhost:8788](http://localhost:8788).
 ```sh
 make verify
 ```
+
+## License
+
+MIT. See [LICENSE](LICENSE).

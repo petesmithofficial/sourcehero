@@ -1,22 +1,22 @@
-import { useSourceHeroWorkbench } from "../hooks/useSourceHeroWorkbench";
-import type { SourceHeroWorkbench } from "../types";
-import { ActiveProjectPanel } from "./workbench/ActiveProjectPanel";
+import { useShowcaseHeroWorkbench } from "../hooks/useShowcaseHeroWorkbench";
+import type { ShowcaseHeroWorkbench } from "../types";
+import { ActiveShowcasePanel } from "./workbench/ActiveShowcasePanel";
 import { MetricStrip } from "./workbench/MetricStrip";
-import { PreviewWorkRow } from "./workbench/PreviewWorkRow";
+import { ShowcaseItemRow } from "./workbench/ShowcaseItemRow";
 import { WindowBar } from "./workbench/WindowBar";
 
-type ProjectWorkbenchProps = {
+type ShowcaseWorkbenchProps = {
   id?: string;
-  workbench: SourceHeroWorkbench;
+  workbench: ShowcaseHeroWorkbench;
 };
 
-export function ProjectWorkbench({ id, workbench }: ProjectWorkbenchProps) {
-  const selectedProjectId = "selected-project";
-  const mobileSelectedProjectId = "selected-project-inline";
+export function ShowcaseWorkbench({ id, workbench }: ShowcaseWorkbenchProps) {
+  const selectedItemId = "selected-showcase-item";
+  const mobileSelectedItemId = "selected-showcase-item-inline";
   const {
-    activeProject,
+    activeItem,
     artifactRef,
-    handleProjectListClick,
+    handleItemListClick,
     handleWorkbenchBlur,
     handleWorkbenchFocus,
     handleWorkbenchKeyDown,
@@ -26,10 +26,10 @@ export function ProjectWorkbench({ id, workbench }: ProjectWorkbenchProps) {
     isWorkbenchEngaged,
     isWorkbenchTracking,
     listRef,
-    previewedProjectName,
+    previewedItemName,
     registerRow,
-    selectProject,
-  } = useSourceHeroWorkbench(workbench.projects);
+    selectItem,
+  } = useShowcaseHeroWorkbench(workbench.items);
   const className = [
     "hero-art",
     isWorkbenchEngaged ? "is-workbench-engaged" : "",
@@ -38,15 +38,15 @@ export function ProjectWorkbench({ id, workbench }: ProjectWorkbenchProps) {
     .filter(Boolean)
     .join(" ");
 
-  if (!activeProject) {
+  if (!activeItem) {
     return (
-      <div className="hero-art" id={id} aria-label={workbench.ariaLabel ?? "Public project index"}>
+      <div className="hero-art" id={id} aria-label={workbench.ariaLabel ?? "Showcase index"}>
         <div className="hero-art-stage">
           <div className="artifact-window artifact-window-main">
             <WindowBar title={workbench.title} />
             <div className="workbench-panel">
               <div className="workbench-summary">
-                <span>{workbench.eyebrow ?? "project index"}</span>
+                <span>{workbench.eyebrow ?? "showcase index"}</span>
                 <strong>{workbench.emptyState ?? workbench.caption}</strong>
               </div>
             </div>
@@ -60,7 +60,7 @@ export function ProjectWorkbench({ id, workbench }: ProjectWorkbenchProps) {
     <div
       className={className}
       id={id}
-      aria-label={workbench.ariaLabel ?? "Public project index"}
+      aria-label={workbench.ariaLabel ?? "Showcase index"}
       onBlur={handleWorkbenchBlur}
       onFocus={handleWorkbenchFocus}
       onPointerEnter={handleWorkbenchPointerEnter}
@@ -73,43 +73,43 @@ export function ProjectWorkbench({ id, workbench }: ProjectWorkbenchProps) {
           <WindowBar title={workbench.title} />
           <div className="workbench-panel">
             <div className="workbench-summary">
-              <span>{workbench.eyebrow ?? "project index"}</span>
+              <span>{workbench.eyebrow ?? "showcase index"}</span>
               <strong>{workbench.caption}</strong>
             </div>
             <ol
-              aria-label="Selectable public projects"
+              aria-label={workbench.listLabel ?? "Selectable showcase items"}
               className="workbench-list"
-              onClick={handleProjectListClick}
+              onClick={handleItemListClick}
               ref={listRef}
             >
-              {workbench.projects.map((item, index) => (
+              {workbench.items.map((item, index) => (
                 <li className="workbench-item" key={item.name}>
-                  <PreviewWorkRow
-                    controlsId={`${selectedProjectId} ${mobileSelectedProjectId}`}
+                  <ShowcaseItemRow
+                    controlsId={`${selectedItemId} ${mobileSelectedItemId}`}
                     index={index}
-                    isActive={item.name === activeProject.name}
-                    isPreviewed={item.name === previewedProjectName && item.name !== activeProject.name}
+                    isActive={item.name === activeItem.name}
+                    isPreviewed={item.name === previewedItemName && item.name !== activeItem.name}
                     item={item}
-                    onActivate={() => selectProject(index)}
+                    onActivate={() => selectItem(index)}
                     setRef={registerRow(index)}
                   />
                 </li>
               ))}
             </ol>
-            <div className="mobile-project-panel">
-              <div className="mini-heading">{workbench.selectedLabel ?? "selected repo"}</div>
-              <ActiveProjectPanel
-                className="side-project side-project-inline"
-                id={mobileSelectedProjectId}
-                project={activeProject}
+            <div className="mobile-showcase-panel">
+              <div className="mini-heading">{workbench.selectedLabel ?? "selected item"}</div>
+              <ActiveShowcasePanel
+                className="showcase-detail showcase-detail-inline"
+                id={mobileSelectedItemId}
+                item={activeItem}
               />
             </div>
           </div>
         </div>
 
         <div className="artifact-window artifact-window-side">
-          <div className="mini-heading">{workbench.selectedLabel ?? "selected repo"}</div>
-          <ActiveProjectPanel id={selectedProjectId} project={activeProject} />
+          <div className="mini-heading">{workbench.selectedLabel ?? "selected item"}</div>
+          <ActiveShowcasePanel id={selectedItemId} item={activeItem} />
         </div>
 
         {workbench.tags && workbench.tags.length > 0 ? <MetricStrip tags={workbench.tags} /> : null}

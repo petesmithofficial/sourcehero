@@ -1,5 +1,5 @@
-import { ProjectWorkbench } from "./components/ProjectWorkbench";
-import type { SourceHeroProps } from "./types";
+import { ShowcaseWorkbench } from "./components/ShowcaseWorkbench";
+import type { ShowcaseHeroProps } from "./types";
 
 const defaultTitleId = "hero-title";
 const defaultWorkbenchId = "work";
@@ -14,7 +14,7 @@ function getOrbitTileClassName(className: string | undefined, index: number) {
   return ["orbit-tile", className ?? defaultOrbitClassName].filter(Boolean).join(" ");
 }
 
-export function SourceHero({
+export function ShowcaseHero({
   actions = [],
   className,
   content,
@@ -22,8 +22,8 @@ export function SourceHero({
   orbitTiles = [],
   titleId = defaultTitleId,
   workbench,
-}: SourceHeroProps) {
-  const sectionClassName = ["source-hero", "hero", className].filter(Boolean).join(" ");
+}: ShowcaseHeroProps) {
+  const sectionClassName = ["showcase-hero", "hero", className].filter(Boolean).join(" ");
 
   return (
     <section className={sectionClassName} id={id} aria-labelledby={titleId}>
@@ -62,7 +62,7 @@ export function SourceHero({
         ) : null}
       </div>
 
-      {workbench ? <ProjectWorkbench id={workbench.id ?? defaultWorkbenchId} workbench={workbench} /> : null}
+      {workbench ? <ShowcaseWorkbench id={workbench.id ?? defaultWorkbenchId} workbench={workbench} /> : null}
     </section>
   );
 }

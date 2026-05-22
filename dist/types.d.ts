@@ -1,25 +1,25 @@
 import type { AnchorHTMLAttributes } from "react";
-export type SourceHeroActionVariant = "primary" | "secondary";
-export type SourceHeroAction = {
+export type ShowcaseHeroActionVariant = "primary" | "secondary";
+export type ShowcaseHeroAction = {
     ariaLabel?: string;
     className?: string;
     href: string;
     label: string;
     rel?: string;
     target?: AnchorHTMLAttributes<HTMLAnchorElement>["target"];
-    variant?: SourceHeroActionVariant;
+    variant?: ShowcaseHeroActionVariant;
 };
-export type SourceHeroOrbitTile = {
+export type ShowcaseHeroOrbitTile = {
     className?: string;
     label: string;
 };
-export type SourceHeroContent = {
+export type ShowcaseHeroContent = {
     detail: string;
     eyebrow: string;
     name: string;
     statement: string;
 };
-export type SourceHeroProjectDestination = {
+export type ShowcaseHeroItemDestination = {
     ariaLabel?: string;
     href: string;
     label: string;
@@ -27,34 +27,38 @@ export type SourceHeroProjectDestination = {
     target?: AnchorHTMLAttributes<HTMLAnchorElement>["target"];
     type?: string;
 };
-export type SourceHeroProject = {
-    destination?: SourceHeroProjectDestination;
-    implementation: string;
+export type ShowcaseHeroItemDetail = {
+    label: string;
+    value: string;
+};
+export type ShowcaseHeroItem = {
+    destination?: ShowcaseHeroItemDestination;
+    details?: readonly ShowcaseHeroItemDetail[];
     metadata?: readonly string[];
     name: string;
-    scope: string;
     signal: string;
     slug: string;
     summary: string;
 };
-export type SourceHeroWorkbench = {
+export type ShowcaseHeroWorkbench = {
     ariaLabel?: string;
     caption: string;
     emptyState?: string;
     eyebrow?: string;
     id?: string;
-    projects: readonly SourceHeroProject[];
+    items: readonly ShowcaseHeroItem[];
+    listLabel?: string;
     selectedLabel?: string;
     tags?: readonly string[];
     title: string;
 };
-export type SourceHeroProps = {
-    actions?: readonly SourceHeroAction[];
+export type ShowcaseHeroProps = {
+    actions?: readonly ShowcaseHeroAction[];
     className?: string;
-    content: SourceHeroContent;
+    content: ShowcaseHeroContent;
     id?: string;
-    orbitTiles?: readonly SourceHeroOrbitTile[];
+    orbitTiles?: readonly ShowcaseHeroOrbitTile[];
     titleId?: string;
-    workbench?: SourceHeroWorkbench;
+    workbench?: ShowcaseHeroWorkbench;
 };
 //# sourceMappingURL=types.d.ts.map

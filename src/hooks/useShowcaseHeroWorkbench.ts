@@ -9,7 +9,7 @@ import {
   type MouseEvent,
   type PointerEvent,
 } from "react";
-import type { SourceHeroProject } from "../types";
+import type { ShowcaseHeroItem } from "../types";
 
 const wheelDeltaMode = {
   line: 1,
@@ -35,9 +35,9 @@ function normalizeWheelDelta(event: WheelEvent, list: HTMLOListElement) {
   return event.deltaY;
 }
 
-export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
-  const [activeProjectName, setActiveProjectName] = useState(projects[0]?.name ?? "");
-  const [previewedProjectName, setPreviewedProjectName] = useState<string | null>(null);
+export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
+  const [activeItemName, setActiveItemName] = useState(items[0]?.name ?? "");
+  const [previewedItemName, setPreviewedItemName] = useState<string | null>(null);
   const [isWorkbenchEngaged, setIsWorkbenchEngaged] = useState(false);
   const [isWorkbenchTracking, setIsWorkbenchTracking] = useState(false);
   const artifactRef = useRef<HTMLDivElement>(null);
@@ -48,30 +48,30 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
   const pendingMotionPoint = useRef<{ clientX: number; clientY: number } | null>(null);
   const pendingPreviewPoint = useRef<{ clientX: number; clientY: number } | null>(null);
   const previewFrame = useRef<number | null>(null);
-  const previewedProjectNameRef = useRef<string | null>(null);
+  const previewedItemNameRef = useRef<string | null>(null);
   const prefersReducedMotionRef = useRef(false);
   const isKeyboardFocusRef = useRef(false);
   const rowRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
-  const activeProjectIndex = useMemo(
-    () => Math.max(0, projects.findIndex((item) => item.name === activeProjectName)),
-    [activeProjectName, projects],
+  const activeItemIndex = useMemo(
+    () => Math.max(0, items.findIndex((item) => item.name === activeItemName)),
+    [activeItemName, items],
   );
-  const activeProject = useMemo(
-    () => projects.find((item) => item.name === activeProjectName) ?? projects[0],
-    [activeProjectName, projects],
+  const activeItem = useMemo(
+    () => items.find((item) => item.name === activeItemName) ?? items[0],
+    [activeItemName, items],
   );
 
-  const previewProject = useCallback((nextProjectName: string | null) => {
-    if (previewedProjectNameRef.current === nextProjectName) {
+  const previewItem = useCallback((nextItemName: string | null) => {
+    if (previewedItemNameRef.current === nextItemName) {
       return;
     }
 
-    previewedProjectNameRef.current = nextProjectName;
-    setPreviewedProjectName(nextProjectName);
+    previewedItemNameRef.current = nextItemName;
+    setPreviewedItemName(nextItemName);
   }, []);
 
-  const cancelSmoothProjectScroll = useCallback(() => {
+  const cancelSmoothItemScroll = useCallback(() => {
     if (scrollFrame.current !== null) {
       window.cancelAnimationFrame(scrollFrame.current);
       scrollFrame.current = null;
@@ -80,28 +80,28 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
     targetScrollTop.current = listRef.current?.scrollTop ?? 0;
   }, []);
 
-  const activateProject = useCallback(
+  const activateItem = useCallback(
     (index: number, shouldScroll = false) => {
-      const nextProject = projects[index];
+      const nextItem = items[index];
 
-      if (!nextProject) {
+      if (!nextItem) {
         return;
       }
 
-      setActiveProjectName(nextProject.name);
-      previewProject(null);
+      setActiveItemName(nextItem.name);
+      previewItem(null);
 
       if (shouldScroll) {
-        cancelSmoothProjectScroll();
+        cancelSmoothItemScroll();
         rowRefs.current[index]?.scrollIntoView({ block: "nearest", behavior: "auto" });
         targetScrollTop.current = listRef.current?.scrollTop ?? 0;
         rowRefs.current[index]?.focus({ preventScroll: true });
       }
     },
-    [cancelSmoothProjectScroll, previewProject, projects],
+    [cancelSmoothItemScroll, previewItem, items],
   );
 
-  const animateProjectScroll = useCallback(() => {
+  const animateItemScroll = useCallback(() => {
     const list = listRef.current;
 
     if (!list) {
@@ -118,10 +118,10 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
     }
 
     list.scrollTop += distance * smoothScrollEase;
-    scrollFrame.current = window.requestAnimationFrame(animateProjectScroll);
+    scrollFrame.current = window.requestAnimationFrame(animateItemScroll);
   }, []);
 
-  const scrollProjectList = useCallback((event: WheelEvent) => {
+  const scrollItemList = useCallback((event: WheelEvent) => {
     const list = listRef.current;
 
     if (!list) {
@@ -145,11 +145,11 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
     }
 
     if (scrollFrame.current === null) {
-      scrollFrame.current = window.requestAnimationFrame(animateProjectScroll);
+      scrollFrame.current = window.requestAnimationFrame(animateItemScroll);
     }
 
     return true;
-  }, [animateProjectScroll]);
+  }, [animateItemScroll]);
 
   useEffect(() => {
     const target = artifactRef.current;
@@ -159,7 +159,7 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
     }
 
     const handleWheel = (event: WheelEvent) => {
-      if (!scrollProjectList(event)) {
+      if (!scrollItemList(event)) {
         return;
       }
 
@@ -172,7 +172,7 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
     return () => {
       target.removeEventListener("wheel", handleWheel);
     };
-  }, [scrollProjectList]);
+  }, [scrollItemList]);
 
   const cancelPendingPreview = useCallback(() => {
     if (previewFrame.current !== null) {
@@ -264,10 +264,10 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
   useEffect(
     () => () => {
       cancelPendingPreview();
-      cancelSmoothProjectScroll();
+      cancelSmoothItemScroll();
       resetWorkbenchMotion();
     },
-    [cancelPendingPreview, cancelSmoothProjectScroll, resetWorkbenchMotion],
+    [cancelPendingPreview, cancelSmoothItemScroll, resetWorkbenchMotion],
   );
 
   const registerRow = useCallback(
@@ -344,10 +344,10 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
     };
   }, [isPointInsideWorkbenchZone, setWorkbenchMotionTarget]);
 
-  const resolveProjectIndexAtPoint = useCallback(
+  const resolveItemIndexAtPoint = useCallback(
     (clientX: number, clientY: number) => {
       const list = listRef.current;
-      const currentProjectName = previewedProjectNameRef.current;
+      const currentItemName = previewedItemNameRef.current;
 
       if (!list) {
         return null;
@@ -378,36 +378,36 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
         return directRowIndex;
       }
 
-      if (currentProjectName) {
-        const currentProjectIndex = projects.findIndex((item) => item.name === currentProjectName);
-        const currentRow = rowRefs.current[currentProjectIndex];
+      if (currentItemName) {
+        const currentItemIndex = items.findIndex((item) => item.name === currentItemName);
+        const currentRow = rowRefs.current[currentItemIndex];
 
         if (currentRow) {
           const rowRect = currentRow.getBoundingClientRect();
           const rowDeadband = 10;
 
           if (clientY >= rowRect.top - rowDeadband && clientY <= rowRect.bottom + rowDeadband) {
-            return currentProjectIndex;
+            return currentItemIndex;
           }
         }
       }
 
-      return currentProjectName ? projects.findIndex((item) => item.name === currentProjectName) : null;
+      return currentItemName ? items.findIndex((item) => item.name === currentItemName) : null;
     },
-    [projects],
+    [items],
   );
 
-  const previewProjectAtPoint = useCallback(
+  const previewItemAtPoint = useCallback(
     (clientX: number, clientY: number) => {
-      const nextProjectIndex = resolveProjectIndexAtPoint(clientX, clientY);
-      const nextProjectName = nextProjectIndex === null || nextProjectIndex < 0 ? null : projects[nextProjectIndex]?.name ?? null;
+      const nextItemIndex = resolveItemIndexAtPoint(clientX, clientY);
+      const nextItemName = nextItemIndex === null || nextItemIndex < 0 ? null : items[nextItemIndex]?.name ?? null;
 
-      previewProject(nextProjectName);
+      previewItem(nextItemName);
     },
-    [previewProject, projects, resolveProjectIndexAtPoint],
+    [previewItem, items, resolveItemIndexAtPoint],
   );
 
-  const schedulePreviewProjectAtPoint = useCallback(
+  const schedulePreviewItemAtPoint = useCallback(
     (clientX: number, clientY: number) => {
       pendingPreviewPoint.current = { clientX, clientY };
 
@@ -422,11 +422,11 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
         pendingPreviewPoint.current = null;
 
         if (point) {
-          previewProjectAtPoint(point.clientX, point.clientY);
+          previewItemAtPoint(point.clientX, point.clientY);
         }
       });
     },
-    [previewProjectAtPoint],
+    [previewItemAtPoint],
   );
 
   const handleWorkbenchBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
@@ -434,9 +434,9 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
       cancelPendingPreview();
       isKeyboardFocusRef.current = false;
       setIsWorkbenchEngaged(false);
-      previewProject(null);
+      previewItem(null);
     }
-  }, [cancelPendingPreview, previewProject]);
+  }, [cancelPendingPreview, previewItem]);
 
   const handleWorkbenchFocus = useCallback(() => {
     if (isKeyboardFocusRef.current) {
@@ -450,8 +450,8 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
     setIsWorkbenchEngaged(false);
     setIsWorkbenchTracking(true);
     setWorkbenchMotionTarget(event.clientX, event.clientY);
-    previewProject(null);
-  }, [cancelPendingPreview, previewProject, setWorkbenchMotionTarget]);
+    previewItem(null);
+  }, [cancelPendingPreview, previewItem, setWorkbenchMotionTarget]);
 
   const handleWorkbenchPointerEnter = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
@@ -461,9 +461,9 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
 
       setIsWorkbenchEngaged(true);
       setIsWorkbenchTracking(false);
-      schedulePreviewProjectAtPoint(event.clientX, event.clientY);
+      schedulePreviewItemAtPoint(event.clientX, event.clientY);
     },
-    [schedulePreviewProjectAtPoint],
+    [schedulePreviewItemAtPoint],
   );
 
   const handleWorkbenchPointerMove = useCallback(
@@ -474,9 +474,9 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
 
       setIsWorkbenchEngaged(true);
       setIsWorkbenchTracking(false);
-      schedulePreviewProjectAtPoint(event.clientX, event.clientY);
+      schedulePreviewItemAtPoint(event.clientX, event.clientY);
     },
-    [schedulePreviewProjectAtPoint],
+    [schedulePreviewItemAtPoint],
   );
 
   const handleWorkbenchKeyDown = useCallback(
@@ -487,50 +487,50 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
 
       if (event.key === "ArrowDown") {
         event.preventDefault();
-        activateProject(Math.min(activeProjectIndex + 1, projects.length - 1), true);
+        activateItem(Math.min(activeItemIndex + 1, items.length - 1), true);
       }
 
       if (event.key === "ArrowUp") {
         event.preventDefault();
-        activateProject(Math.max(activeProjectIndex - 1, 0), true);
+        activateItem(Math.max(activeItemIndex - 1, 0), true);
       }
 
       if (event.key === "Home") {
         event.preventDefault();
-        activateProject(0, true);
+        activateItem(0, true);
       }
 
       if (event.key === "End") {
         event.preventDefault();
-        activateProject(projects.length - 1, true);
+        activateItem(items.length - 1, true);
       }
     },
-    [activateProject, activeProjectIndex, projects.length],
+    [activateItem, activeItemIndex, items.length],
   );
 
-  const handleProjectListClick = useCallback(
+  const handleItemListClick = useCallback(
     (event: MouseEvent<HTMLOListElement>) => {
       isKeyboardFocusRef.current = false;
 
-      if (event.target instanceof Element && event.target.closest("[data-project-index]")) {
+      if (event.target instanceof Element && event.target.closest("[data-showcase-index]")) {
         return;
       }
 
-      const nextProjectIndex = resolveProjectIndexAtPoint(event.clientX, event.clientY);
+      const nextItemIndex = resolveItemIndexAtPoint(event.clientX, event.clientY);
 
-      if (nextProjectIndex === null || nextProjectIndex < 0) {
+      if (nextItemIndex === null || nextItemIndex < 0) {
         return;
       }
 
-      activateProject(nextProjectIndex);
+      activateItem(nextItemIndex);
     },
-    [activateProject, resolveProjectIndexAtPoint],
+    [activateItem, resolveItemIndexAtPoint],
   );
 
   return {
-    activeProject,
+    activeItem,
     artifactRef,
-    handleProjectListClick,
+    handleItemListClick,
     handleWorkbenchBlur,
     handleWorkbenchFocus,
     handleWorkbenchKeyDown,
@@ -540,8 +540,8 @@ export function useSourceHeroWorkbench(projects: readonly SourceHeroProject[]) {
     isWorkbenchEngaged,
     isWorkbenchTracking,
     listRef,
-    previewedProjectName,
+    previewedItemName,
     registerRow,
-    selectProject: activateProject,
+    selectItem: activateItem,
   };
 }

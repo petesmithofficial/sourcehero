@@ -1,10 +1,10 @@
-import { SourceHero } from "../SourceHero";
+import { ShowcaseHero } from "../ShowcaseHero";
 import { demoHeroProps } from "./demo-data";
 
 export function App() {
   return (
     <main>
-      <SourceHero {...demoHeroProps} />
+      <ShowcaseHero {...demoHeroProps} />
     </main>
   );
 }

@@ -1,16 +1,16 @@
-import type { SourceHeroProject } from "../../types";
+import type { ShowcaseHeroItem } from "../../types";
 
-type PreviewWorkRowProps = {
+type ShowcaseItemRowProps = {
   controlsId: string;
   index: number;
   isActive: boolean;
   isPreviewed: boolean;
-  item: SourceHeroProject;
+  item: ShowcaseHeroItem;
   onActivate: () => void;
   setRef: (node: HTMLButtonElement | null) => void;
 };
 
-export function PreviewWorkRow({
+export function ShowcaseItemRow({
   controlsId,
   index,
   isActive,
@@ -18,7 +18,7 @@ export function PreviewWorkRow({
   item,
   onActivate,
   setRef,
-}: PreviewWorkRowProps) {
+}: ShowcaseItemRowProps) {
   const className = ["workbench-row", isActive ? "is-active" : "", isPreviewed ? "is-previewed" : ""]
     .filter(Boolean)
     .join(" ");
@@ -30,8 +30,8 @@ export function PreviewWorkRow({
       aria-describedby={summaryId}
       aria-pressed={isActive}
       className={className}
-      data-project-index={index}
-      id={`project-${item.slug}`}
+      data-showcase-index={index}
+      id={`showcase-${item.slug}`}
       onClick={onActivate}
       ref={setRef}
       type="button"
@@ -40,7 +40,7 @@ export function PreviewWorkRow({
       <div>
         <strong>{item.name}</strong>
         <p>{item.summary}</p>
-        <small id={summaryId}>{item.scope}</small>
+        <small id={summaryId}>{item.details?.[0]?.value ?? item.summary}</small>
       </div>
       <em>{item.signal}</em>
     </button>

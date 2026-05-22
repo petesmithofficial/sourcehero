@@ -1,7 +1,7 @@
 {
-  "name": "@petesmithofficial/source-hero",
+  "name": "@petesmithofficial/sourcehero",
   "version": "0.1.0",
-  "description": "A customizable React source-code hero with an interactive project workbench.",
+  "description": "A customizable React showcase hero with an interactive item workbench.",
   "type": "module",
   "private": false,
   "license": "MIT",

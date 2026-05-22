@@ -6,7 +6,7 @@ const root = path.resolve(new URL("..", import.meta.url).pathname);
 const requiredFiles = [
   "dist/index.js",
   "dist/index.d.ts",
-  "src/SourceHero.tsx",
+  "src/ShowcaseHero.tsx",
   "src/styles.css",
   "src/demo/App.tsx",
   "src/demo/demo-data.ts",
@@ -46,19 +46,22 @@ const source = [
 ].join("\n");
 
 for (const text of [
-  "@petesmithofficial/source-hero",
-  "SourceHero",
-  "SourceHeroProps",
-  "SourceHeroWorkbench",
-  "SourceHeroProject",
-  "source-hero",
+  "@petesmithofficial/sourcehero",
+  "ShowcaseHero",
+  "ShowcaseHeroProps",
+  "ShowcaseHeroWorkbench",
+  "ShowcaseHeroItem",
+  "sourcehero",
+  "showcase-hero",
   "orbitTiles",
   "workbench",
+  "items",
+  "details",
   "metadata",
   "destination",
   "prefers-reduced-motion",
-  "Selectable public projects",
-  "Open repo ->",
+  "Selectable showcase items",
+  "Open case study ->",
 ]) {
   if (!source.includes(text)) {
     throw new Error(`Missing expected package contract text: ${text}`);
@@ -73,4 +76,21 @@ if (pkg.exports?.["./styles.css"] !== "./src/styles.css") {
   throw new Error("Package must expose the component stylesheet.");
 }
 
-console.log("source-hero verification passed.");
+for (const text of [
+  "SourceHero",
+  "source-hero",
+  "SourceHeroProps",
+  "SourceHeroProject",
+  "Public project index",
+  "Selectable public projects",
+  "selected repo",
+  "Scope</dt>",
+  "Implementation</dt>",
+  "constraints",
+]) {
+  if (source.includes(text)) {
+    throw new Error(`Repo-specific copy or API name found: ${text}`);
+  }
+}
+
+console.log("sourcehero verification passed.");

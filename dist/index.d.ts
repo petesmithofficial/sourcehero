@@ -1,3 +1,3 @@
-export { SourceHero } from "./SourceHero";
-export type { SourceHeroAction, SourceHeroActionVariant, SourceHeroContent, SourceHeroOrbitTile, SourceHeroProject, SourceHeroProjectDestination, SourceHeroProps, SourceHeroWorkbench, } from "./types";
+export { ShowcaseHero } from "./ShowcaseHero";
+export type { ShowcaseHeroAction, ShowcaseHeroActionVariant, ShowcaseHeroContent, ShowcaseHeroItem, ShowcaseHeroItemDestination, ShowcaseHeroItemDetail, ShowcaseHeroOrbitTile, ShowcaseHeroProps, ShowcaseHeroWorkbench, } from "./types";
 //# sourceMappingURL=index.d.ts.map
