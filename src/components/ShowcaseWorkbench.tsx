@@ -1,9 +1,9 @@
-import { useShowcaseHeroWorkbench } from "../hooks/useShowcaseHeroWorkbench";
-import type { ShowcaseHeroWorkbench } from "../types";
-import { ActiveShowcasePanel } from "./workbench/ActiveShowcasePanel";
-import { MetricStrip } from "./workbench/MetricStrip";
-import { ShowcaseItemRow } from "./workbench/ShowcaseItemRow";
-import { WindowBar } from "./workbench/WindowBar";
+import { useShowcaseHeroWorkbench } from "../hooks/useShowcaseHeroWorkbench.js";
+import type { ShowcaseHeroWorkbench } from "../types.js";
+import { ActiveShowcasePanel } from "./workbench/ActiveShowcasePanel.js";
+import { MetricStrip } from "./workbench/MetricStrip.js";
+import { ShowcaseItemRow } from "./workbench/ShowcaseItemRow.js";
+import { WindowBar } from "./workbench/WindowBar.js";
 
 type ShowcaseWorkbenchProps = {
   id?: string;

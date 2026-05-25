@@ -1,4 +1,4 @@
-import type { ShowcaseHeroItem } from "../../types";
+import type { ShowcaseHeroItem } from "../../types.js";
 type ShowcaseItemRowProps = {
     controlsId: string;
     index: number;

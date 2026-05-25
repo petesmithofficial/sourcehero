@@ -1,5 +1,5 @@
-import { ShowcaseWorkbench } from "./components/ShowcaseWorkbench";
-import type { ShowcaseHeroProps } from "./types";
+import { ShowcaseWorkbench } from "./components/ShowcaseWorkbench.js";
+import type { ShowcaseHeroProps } from "./types.js";
 
 const defaultTitleId = "hero-title";
 const defaultWorkbenchId = "work";

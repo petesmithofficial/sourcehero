@@ -1,5 +1,5 @@
 import { type FocusEvent, type KeyboardEvent, type PointerEvent } from "react";
-import type { ShowcaseHeroItem, ShowcaseHeroMotion } from "../types";
+import type { ShowcaseHeroItem, ShowcaseHeroMotion } from "../types.js";
 export declare function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], motion?: ShowcaseHeroMotion): {
     activeItem: ShowcaseHeroItem;
     artifactRef: import("react").RefObject<HTMLDivElement | null>;

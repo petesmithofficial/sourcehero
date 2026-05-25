@@ -8,7 +8,7 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
-import type { ShowcaseHeroItem, ShowcaseHeroMotion } from "../types";
+import type { ShowcaseHeroItem, ShowcaseHeroMotion } from "../types.js";
 
 const wheelDeltaMode = {
   line: 1,

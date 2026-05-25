@@ -1,1 +1,1 @@
-{"version":3,"file":"ShowcaseHero.d.ts","sourceRoot":"","sources":["../src/ShowcaseHero.tsx"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,iBAAiB,EAAE,MAAM,SAAS,CAAC;AAejD,wBAAgB,YAAY,CAAC,EAC3B,OAAY,EACZ,SAAS,EACT,OAAO,EACP,EAAE,EACF,UAAe,EACf,OAAwB,EACxB,SAAS,GACV,EAAE,iBAAiB,2CA2CnB"}
+{"version":3,"file":"ShowcaseHero.d.ts","sourceRoot":"","sources":["../src/ShowcaseHero.tsx"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAE,iBAAiB,EAAE,MAAM,YAAY,CAAC;AAepD,wBAAgB,YAAY,CAAC,EAC3B,OAAY,EACZ,SAAS,EACT,OAAO,EACP,EAAE,EACF,UAAe,EACf,OAAwB,EACxB,SAAS,GACV,EAAE,iBAAiB,2CA2CnB"}

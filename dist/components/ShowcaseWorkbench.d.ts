@@ -1,4 +1,4 @@
-import type { ShowcaseHeroWorkbench } from "../types";
+import type { ShowcaseHeroWorkbench } from "../types.js";
 type ShowcaseWorkbenchProps = {
     id?: string;
     workbench: ShowcaseHeroWorkbench;

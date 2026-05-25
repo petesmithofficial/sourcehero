@@ -8,7 +8,7 @@ export const demoHeroProps: ShowcaseHeroProps = {
       variant: "primary",
     },
     {
-      href: "https://github.com/petesmithofficial/sourcehero",
+      href: "https://github.com/petesmithofficial/showcase-hero",
       label: "Read docs",
       rel: "noopener noreferrer",
       target: "_blank",

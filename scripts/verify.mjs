@@ -47,13 +47,22 @@ const source = [
   read("README.md"),
 ].join("\n");
 
+const releaseText = [
+  source,
+  read("index.html"),
+  read("package-lock.json"),
+  read("package.json"),
+  read("tsconfig.build.json"),
+  read("tsconfig.json"),
+  read("vite.config.ts"),
+].join("\n");
+
 for (const text of [
-  "@petesmithofficial/sourcehero",
+  "@petesmithofficial/showcase-hero",
   "ShowcaseHero",
   "ShowcaseHeroProps",
   "ShowcaseHeroWorkbench",
   "ShowcaseHeroItem",
-  "sourcehero",
   "showcase-hero",
   "orbitTiles",
   "workbench",
@@ -64,7 +73,7 @@ for (const text of [
   "prefers-reduced-motion",
   "Selectable showcase items",
   "Open case study ->",
-  "npm install @petesmithofficial/sourcehero",
+  "npm install @petesmithofficial/showcase-hero",
   "workbench.motion.maxTiltDegrees",
 ]) {
   if (!source.includes(text)) {
@@ -96,13 +105,18 @@ if (!pkg.files?.includes("docs")) {
   throw new Error("Package must include docs assets referenced by README.");
 }
 
+const retiredPrefix = "source";
+const retiredPascalPrefix = "Source";
+
 for (const text of [
-  "SourceHero",
-  "source-hero",
+  `${retiredPascalPrefix}Hero`,
+  `${retiredPrefix}hero`,
+  `${retiredPrefix}-hero`,
+  `@petesmithofficial/${retiredPrefix}hero`,
   "archive/main",
   "tar.gz",
-  "SourceHeroProps",
-  "SourceHeroProject",
+  `${retiredPascalPrefix}HeroProps`,
+  `${retiredPascalPrefix}HeroProject`,
   "Public project index",
   "Selectable public projects",
   "selected repo",
@@ -110,9 +124,9 @@ for (const text of [
   "Implementation</dt>",
   "constraints",
 ]) {
-  if (source.includes(text)) {
+  if (releaseText.includes(text)) {
     throw new Error(`Repo-specific copy or API name found: ${text}`);
   }
 }
 
-console.log("sourcehero verification passed.");
+console.log("showcase-hero verification passed.");

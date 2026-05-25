@@ -1,4 +1,4 @@
-export { ShowcaseHero } from "./ShowcaseHero";
+export { ShowcaseHero } from "./ShowcaseHero.js";
 export type {
   ShowcaseHeroAction,
   ShowcaseHeroActionVariant,
@@ -10,4 +10,4 @@ export type {
   ShowcaseHeroOrbitTile,
   ShowcaseHeroProps,
   ShowcaseHeroWorkbench,
-} from "./types";
+} from "./types.js";

@@ -1,4 +1,4 @@
-import type { ShowcaseHeroItem } from "../../types";
+import type { ShowcaseHeroItem } from "../../types.js";
 type ActiveShowcasePanelProps = {
     className?: string;
     id: string;

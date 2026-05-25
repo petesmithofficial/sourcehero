@@ -1,5 +1,5 @@
 {
-  "name": "@petesmithofficial/sourcehero",
+  "name": "@petesmithofficial/showcase-hero",
   "version": "0.1.0",
   "description": "A customizable React showcase hero with an interactive item workbench.",
   "type": "module",
@@ -17,12 +17,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/petesmithofficial/sourcehero.git"
+    "url": "git+https://github.com/petesmithofficial/showcase-hero.git"
   },
   "bugs": {
-    "url": "https://github.com/petesmithofficial/sourcehero/issues"
+    "url": "https://github.com/petesmithofficial/showcase-hero/issues"
   },
-  "homepage": "https://github.com/petesmithofficial/sourcehero#readme",
+  "homepage": "https://github.com/petesmithofficial/showcase-hero#readme",
   "publishConfig": {
     "access": "public"
   },

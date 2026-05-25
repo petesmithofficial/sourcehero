@@ -1,28 +1,41 @@
-# sourcehero
+# showcase-hero
 
-`sourcehero` is a small React package that exports `ShowcaseHero`: a reusable hero section with orbit labels, action links, and an interactive showcase workbench.
+A polished, data-driven React hero component for presenting selected work, products, case studies, writing, demos, or technical references.
 
-The component is intentionally data-driven. It can present products, case studies, talks, writing, demos, downloads, technical references, or any other selected set of work.
+`@petesmithofficial/showcase-hero` exports a typed `ShowcaseHero` component with a responsive layout, optional action links, floating orbit labels, and an interactive workbench for highlighting selected items.
 
-![ShowcaseHero demo preview](docs/showcasehero-preview.png)
+![ShowcaseHero preview](docs/showcasehero-preview.png)
+
+## Features
+
+- Typed React API with first-class TypeScript declarations.
+- Data-driven content model for hero copy, calls to action, orbit labels, and selected work.
+- Interactive workbench with pointer tracking, keyboard navigation, hover previews, and touch support.
+- Configurable workbench tilt through `workbench.motion.maxTiltDegrees`.
+- Scoped stylesheet with responsive layout and reduced-motion handling.
+- Packaged for normal npm installation with CSS and documentation assets included.
 
 ## Install
 
 ```sh
-npm install @petesmithofficial/sourcehero
+npm install @petesmithofficial/showcase-hero
 ```
 
+## Quick Start
+
+Import the component and stylesheet from the package:
+
 ```tsx
-import { ShowcaseHero, type ShowcaseHeroProps } from "@petesmithofficial/sourcehero";
-import "@petesmithofficial/sourcehero/styles.css";
+import { ShowcaseHero, type ShowcaseHeroProps } from "@petesmithofficial/showcase-hero";
+import "@petesmithofficial/showcase-hero/styles.css";
 
 const hero: ShowcaseHeroProps = {
   actions: [
-    { href: "#showcase", label: "View showcase" },
+    { href: "#work", label: "View work" },
     { href: "/contact", label: "Contact", variant: "secondary" },
   ],
   content: {
-    detail: "Selected work, demos, and notes in one focused opening section.",
+    detail: "A focused introduction for selected work, product stories, and technical notes.",
     eyebrow: "Portfolio system",
     name: "ShowcaseHero",
     statement: "A flexible hero for public work.",
@@ -30,7 +43,7 @@ const hero: ShowcaseHeroProps = {
   orbitTiles: [{ label: "UI" }, { label: "API" }, { label: "DOC" }],
   workbench: {
     caption: "One hero. Any curated set of work.",
-    id: "showcase",
+    id: "work",
     items: [
       {
         destination: {
@@ -64,40 +77,89 @@ export function Page() {
 }
 ```
 
-## Props
+## API
 
-`ShowcaseHero` is controlled through a single `ShowcaseHeroProps` object:
+`ShowcaseHero` accepts a single `ShowcaseHeroProps` object.
 
-- `content`: eyebrow, name, statement, and detail copy.
-- `actions`: primary or secondary hero links.
-- `orbitTiles`: optional floating labels. The first four tiles get default positions.
-- `workbench`: optional interactive index with `items`, item metadata, arbitrary detail rows, signal text, tags, and destination links.
-- `workbench.motion.maxTiltDegrees`: optional cap for the pointer-following workbench rotation. Omit it to use the default motion. Providing it only changes rotation amplitude; pointer tracking, translation, hover behavior, and timing stay the same.
+| Prop | Type | Description |
+| --- | --- | --- |
+| `content` | `ShowcaseHeroContent` | Required hero copy: `eyebrow`, `name`, `statement`, and `detail`. |
+| `actions` | `ShowcaseHeroAction[]` | Optional primary and secondary links displayed below the hero copy. |
+| `orbitTiles` | `ShowcaseHeroOrbitTile[]` | Optional floating labels. The first four tiles receive default positions. |
+| `workbench` | `ShowcaseHeroWorkbench` | Optional interactive panel for selectable showcase items. |
+| `className` | `string` | Optional class added to the root section. |
+| `id` | `string` | Optional root section id. |
+| `titleId` | `string` | Optional id for the hero heading used by `aria-labelledby`. |
 
-Each showcase item uses neutral fields:
+### Workbench Items
 
-- `name`: the visible item title.
-- `summary`: the short row description.
-- `details`: optional label/value rows for anything you want to explain.
-- `metadata`: optional chips such as technology, medium, status, audience, or destination type.
-- `signal`: a compact status/category label.
-- `destination`: optional link with caller-controlled label, target, rel, and type.
+Each workbench item is intentionally neutral, so it can represent a case study, project, article, demo, download, product area, or reference.
 
-The stylesheet is scoped under `.showcase-hero` and includes responsive and reduced-motion handling. You can override colors and spacing with CSS custom properties on the component root.
+| Field | Description |
+| --- | --- |
+| `name` | Visible item title. |
+| `summary` | Short row description. |
+| `signal` | Compact category or status label. |
+| `slug` | Stable caller-owned identifier. |
+| `details` | Optional label/value rows for the selected item panel. |
+| `metadata` | Optional chips such as technology, medium, status, or audience. |
+| `destination` | Optional link with caller-controlled label, target, rel, aria label, and type. |
 
-## Local Demo
+## Motion
+
+The workbench follows the pointer using viewport-based rotation and subtle translation. By default, the maximum Y-axis tilt is `8deg`.
+
+Use `workbench.motion.maxTiltDegrees` to tune the rotation intensity:
+
+```tsx
+const hero: ShowcaseHeroProps = {
+  content,
+  workbench: {
+    caption: "Selected work",
+    items,
+    motion: { maxTiltDegrees: 5 },
+    title: "workbench",
+  },
+};
+```
+
+This option changes only the rotation amplitude. Pointer tracking, translation, hover behavior, touch behavior, and timing remain unchanged.
+
+## Styling
+
+Import the packaged stylesheet once in your app:
+
+```tsx
+import "@petesmithofficial/showcase-hero/styles.css";
+```
+
+The stylesheet is scoped under `.showcase-hero`. You can override colors, spacing, shadows, and panel treatments with CSS custom properties on the component root:
+
+```css
+.showcase-hero {
+  --hero-bg: #111318;
+  --hero-accent: #f4c95d;
+  --hero-panel: rgba(255, 255, 255, 0.08);
+}
+```
+
+## Accessibility
+
+- The root section uses `aria-labelledby` for the hero heading.
+- The workbench list supports pointer selection and keyboard navigation with `ArrowUp`, `ArrowDown`, `Home`, and `End`.
+- Destination links accept caller-provided `ariaLabel`, `target`, and `rel` values.
+- Motion is disabled for users who request reduced motion.
+
+## Development
 
 ```sh
 make dev
-```
-
-The demo runs on [http://localhost:8788](http://localhost:8788).
-
-## Verify
-
-```sh
 make verify
 ```
+
+The local demo runs on [http://localhost:8788](http://localhost:8788).
+
+`make verify` runs TypeScript checks, the production build, and package contract checks.
 
 ## License
 
