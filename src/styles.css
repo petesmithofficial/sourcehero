@@ -308,12 +308,6 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-}
-
-.showcase-hero .hero-art-motion-layer {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
   transform-style: preserve-3d;
   transform-origin: var(--workbench-origin-x) var(--workbench-origin-y);
   transform:
@@ -326,7 +320,14 @@
   will-change: transform;
 }
 
-.showcase-hero .hero-art.is-workbench-tracking .hero-art-motion-layer {
+.showcase-hero .hero-art-motion-layer {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  transform-style: preserve-3d;
+}
+
+.showcase-hero .hero-art.is-workbench-tracking .hero-art-stage {
   animation: none;
   transition-duration: 90ms;
 }

@@ -59,6 +59,7 @@ const releaseText = [
 
 for (const text of [
   "@petesmithofficial/showcase-hero",
+  "https://www.npmjs.com/package/@petesmithofficial/showcase-hero",
   "ShowcaseHero",
   "ShowcaseHeroProps",
   "ShowcaseHeroWorkbench",
@@ -75,6 +76,10 @@ for (const text of [
   "Open case study ->",
   "npm install @petesmithofficial/showcase-hero",
   "workbench.motion.maxTiltDegrees",
+  "motion: { maxTiltDegrees: 12 }",
+  "The package owns the motion transform",
+  "Consumer styles should not apply transforms",
+  "--accent-electric",
 ]) {
   if (!source.includes(text)) {
     throw new Error(`Missing expected package contract text: ${text}`);

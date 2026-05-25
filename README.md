@@ -4,6 +4,8 @@ A polished, data-driven React hero component for presenting selected work, produ
 
 `@petesmithofficial/showcase-hero` exports a typed `ShowcaseHero` component with a responsive layout, optional action links, floating orbit labels, and an interactive workbench for highlighting selected items.
 
+[npm package](https://www.npmjs.com/package/@petesmithofficial/showcase-hero)
+
 ![ShowcaseHero preview](docs/showcasehero-preview.png)
 
 ## Features
@@ -65,7 +67,7 @@ const hero: ShowcaseHeroProps = {
       },
     ],
     listLabel: "Selectable showcase items",
-    motion: { maxTiltDegrees: 6 },
+    motion: { maxTiltDegrees: 12 },
     selectedLabel: "selected item",
     tags: ["typed props", "responsive", "themeable"],
     title: "selected work",
@@ -109,7 +111,7 @@ Each workbench item is intentionally neutral, so it can represent a case study, 
 
 The workbench follows the pointer using viewport-based rotation and subtle translation. By default, the maximum Y-axis tilt is `8deg`.
 
-Use `workbench.motion.maxTiltDegrees` to tune the rotation intensity:
+Use `workbench.motion.maxTiltDegrees` to tune the rotation intensity. A value around `12` gives a stronger, more responsive follow effect; lower values such as `5` or `6` are calmer.
 
 ```tsx
 const hero: ShowcaseHeroProps = {
@@ -125,6 +127,8 @@ const hero: ShowcaseHeroProps = {
 
 This option changes only the rotation amplitude. Pointer tracking, translation, hover behavior, touch behavior, and timing remain unchanged.
 
+The package owns the motion transform and hit-tested workbench layout. Consumer styles should not apply transforms, pointer-event changes, overflow changes, or z-index changes to internal motion classes such as `.hero-art-stage`, `.hero-art-motion-layer`, `.workbench-list`, or `.workbench-row`; those overrides can make visible rows drift away from their click targets. Prefer the root `className` prop and CSS custom properties for theming.
+
 ## Styling
 
 Import the packaged stylesheet once in your app:
@@ -133,15 +137,24 @@ Import the packaged stylesheet once in your app:
 import "@petesmithofficial/showcase-hero/styles.css";
 ```
 
-The stylesheet is scoped under `.showcase-hero`. You can override colors, spacing, shadows, and panel treatments with CSS custom properties on the component root:
+The stylesheet is scoped under `.showcase-hero`. Import it once and let it own the component structure, motion wrappers, list behavior, and responsive layout. You can override colors, spacing, shadows, and panel treatments with CSS custom properties on the component root:
 
 ```css
 .showcase-hero {
-  --hero-bg: #111318;
-  --hero-accent: #f4c95d;
-  --hero-panel: rgba(255, 255, 255, 0.08);
+  --bg: #111318;
+  --panel: rgba(255, 255, 255, 0.08);
+  --text: #f5f1e8;
+  --muted: #a8adbb;
+  --line: rgba(255, 255, 255, 0.13);
+  --accent: #f4c95d;
+  --accent-electric: #f4c95d;
+  --accent-cyan: #63f7ff;
+  --shadow: 0 28px 90px rgba(0, 0, 0, 0.45);
+  --radius: 8px;
 }
 ```
+
+If you need heavier visual customization, add a caller-owned class with `className` and keep overrides focused on color, font, shadow, border, and background properties. Avoid replacing the internal layout and interaction rules unless you are intentionally forking the component.
 
 ## Accessibility
 

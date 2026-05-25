@@ -87,6 +87,7 @@ export const demoHeroProps: ShowcaseHeroProps = {
       },
     ],
     listLabel: "Selectable showcase items",
+    motion: { maxTiltDegrees: 12 },
     selectedLabel: "selected item",
     tags: ["typed props", "responsive", "themeable"],
     title: "demo showcase",
