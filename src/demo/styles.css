@@ -27,4 +27,5 @@ a {
 
 main {
   min-height: 100vh;
+  padding-bottom: clamp(4rem, 10vh, 7rem);
 }

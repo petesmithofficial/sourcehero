@@ -13,9 +13,20 @@ A polished, data-driven React hero component for presenting selected work, produ
 - Typed React API with first-class TypeScript declarations.
 - Data-driven content model for hero copy, calls to action, orbit labels, and selected work.
 - Interactive workbench with pointer tracking, keyboard navigation, hover previews, and touch support.
-- Configurable workbench tilt through `workbench.motion.maxTiltDegrees`.
+- Configurable workbench tilt and touch release behavior through `workbench.motion`.
 - Scoped stylesheet with responsive layout and reduced-motion handling.
 - Packaged for normal npm installation with CSS and documentation assets included.
+
+## Release Notes
+
+Current release: `0.2.0`.
+
+- Added `workbench.motion.touchReleaseReturn` for tuning touch release hold and return timing.
+- Pointer tracking is smoothed across mouse and touch input so the workbench follows movement fluidly without losing its responsive feel.
+- Added inline TypeScript documentation for exported prop types, improving editor hover and autocomplete guidance.
+- No breaking changes from `0.1.x`.
+
+See [CHANGELOG.md](CHANGELOG.md) for full release notes.
 
 ## Install
 
@@ -39,7 +50,7 @@ const hero: ShowcaseHeroProps = {
   content: {
     detail: "A focused introduction for selected work, product stories, and technical notes.",
     eyebrow: "Portfolio system",
-    name: "ShowcaseHero",
+    name: "Showcase Hero",
     statement: "A flexible hero for public work.",
   },
   orbitTiles: [{ label: "UI" }, { label: "API" }, { label: "DOC" }],
@@ -111,6 +122,8 @@ Each workbench item is intentionally neutral, so it can represent a case study, 
 
 The workbench follows the pointer using viewport-based rotation and subtle translation. By default, the maximum Y-axis tilt is `8deg`. On touch devices, the workbench holds the final touch tilt for `220ms`, then eases back to its idle centered pose over `760ms`.
 
+Pointer tracking is smoothed across coarse touch event streams while remaining direct enough for desktop pointer movement. This smoothing is part of the component behavior; consumers normally only need to tune the amplitude and touch release timing below.
+
 Use `workbench.motion.maxTiltDegrees` to tune the rotation intensity. A value around `12` gives a stronger, more responsive follow effect; lower values such as `5` or `6` are calmer.
 
 ```tsx
@@ -148,7 +161,7 @@ const hero: ShowcaseHeroProps = {
 | Motion field | Default | Description |
 | --- | --- | --- |
 | `maxTiltDegrees` | `8` | Maximum Y-axis tilt used to scale pointer-follow rotation. |
-| `touchReleaseReturn.holdMs` | `220` | How long a touch release keeps the final tilt before returning. |
+| `touchReleaseReturn.holdMs` | `220` | Touch release return hold time before the workbench starts returning. |
 | `touchReleaseReturn.durationMs` | `760` | How long the touch release return animation takes. |
 
 The package owns the motion transform and hit-tested workbench layout. Consumer styles should not apply transforms, pointer-event changes, overflow changes, or z-index changes to internal motion classes such as `.hero-art-stage`, `.hero-art-motion-layer`, `.workbench-list`, or `.workbench-row`; those overrides can make visible rows drift away from their click targets. Prefer the root `className` prop and CSS custom properties for theming.

@@ -258,6 +258,10 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
     const baseScrollTop = scrollFrame.current === null ? list.scrollTop : targetScrollTop.current;
     const nextScrollTop = clampScrollTop(baseScrollTop + normalizeWheelDelta(event, list), maxScrollTop);
 
+    if (Math.abs(nextScrollTop - baseScrollTop) <= smoothScrollSnapDistance) {
+      return false;
+    }
+
     targetScrollTop.current = nextScrollTop;
 
     if (prefersReducedMotionRef.current) {
@@ -273,7 +277,7 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
   }, [animateItemScroll]);
 
   useEffect(() => {
-    const target = artifactRef.current;
+    const target = listRef.current;
 
     if (!target) {
       return;

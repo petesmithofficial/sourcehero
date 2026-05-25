@@ -13,6 +13,7 @@ const requiredFiles = [
   "src/demo/App.tsx",
   "src/demo/demo-data.ts",
   "README.md",
+  "CHANGELOG.md",
   "Makefile",
   "package.json",
 ];
@@ -45,11 +46,13 @@ const readSourceFiles = (dir) => {
 const source = [
   ...readSourceFiles(path.join(root, "src")),
   read("README.md"),
+  read("CHANGELOG.md"),
 ].join("\n");
 
 const releaseText = [
   source,
   read("index.html"),
+  read("CHANGELOG.md"),
   read("package-lock.json"),
   read("package.json"),
   read("tsconfig.build.json"),
@@ -76,7 +79,12 @@ for (const text of [
   "Open case study ->",
   "npm install @petesmithofficial/showcase-hero",
   "workbench.motion.maxTiltDegrees",
+  "workbench.motion.touchReleaseReturn",
+  "Touch release return",
+  "Pointer tracking is smoothed",
   "motion: { maxTiltDegrees: 12 }",
+  "## 0.2.0 - 2026-05-25",
+  "No breaking changes",
   "The package owns the motion transform",
   "Consumer styles should not apply transforms",
   "--accent-electric",
@@ -108,6 +116,10 @@ if (pkg.types !== "./dist/index.d.ts") {
 
 if (!pkg.files?.includes("docs")) {
   throw new Error("Package must include docs assets referenced by README.");
+}
+
+if (!pkg.files?.includes("CHANGELOG.md")) {
+  throw new Error("Package must include release notes.");
 }
 
 const retiredPrefix = "source";

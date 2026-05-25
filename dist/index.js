@@ -3,7 +3,7 @@ import { useState as j, useRef as w, useMemo as z, useCallback as s, useEffect a
 const te = {
   line: 1,
   page: 2
-}, be = 18, ye = 0.26, ge = 0.35, ve = 13, ae = 16, Ne = 0.72, ke = 18, Me = 16, Te = ae * 0.5, Pe = 220, Ie = 760, We = 0.52, Se = 0.3, xe = 0.04;
+}, ye = 18, ge = 0.26, ne = 0.35, ve = 13, le = 16, Me = 0.72, Ne = 18, ke = 16, Te = le * 0.5, Pe = 220, Ie = 760, We = 0.52, Se = 0.3, xe = 0.04;
 function Re(t) {
   return {
     pointerType: t,
@@ -21,14 +21,14 @@ function Ye(t) {
   const n = t == null ? void 0 : t.maxTiltDegrees;
   return typeof n != "number" || !Number.isFinite(n) || n <= 0 ? 1 : n / Te;
 }
-function ne(t, n) {
+function re(t, n) {
   return typeof t != "number" || !Number.isFinite(t) || t < 0 ? n : t;
 }
 function Ee(t) {
   var n, o;
   return {
-    durationMs: ne((n = t == null ? void 0 : t.touchReleaseReturn) == null ? void 0 : n.durationMs, Ie),
-    holdMs: ne((o = t == null ? void 0 : t.touchReleaseReturn) == null ? void 0 : o.holdMs, Pe)
+    durationMs: re((n = t == null ? void 0 : t.touchReleaseReturn) == null ? void 0 : n.durationMs, Ie),
+    holdMs: re((o = t == null ? void 0 : t.touchReleaseReturn) == null ? void 0 : o.holdMs, Pe)
   };
 }
 function De(t, n) {
@@ -64,11 +64,11 @@ function $e(t) {
   return Number.isNaN(m) ? null : m;
 }
 function Ae(t, n) {
-  return t.deltaMode === te.line ? t.deltaY * be : t.deltaMode === te.page ? t.deltaY * n.clientHeight : t.deltaY;
+  return t.deltaMode === te.line ? t.deltaY * ye : t.deltaMode === te.page ? t.deltaY * n.clientHeight : t.deltaY;
 }
 function He(t, n) {
   var ee;
-  const [o, m] = j(((ee = t[0]) == null ? void 0 : ee.name) ?? ""), [c, v] = j(null), [u, p] = j(!1), [l, b] = j(!1), [F, W] = j(!1), S = w(null), Y = w(null), M = w(null), N = w(null), E = w(null), D = w(null), x = w(0), A = w(null), H = w(null), K = w(null), X = w(!1), P = w(!1), R = w(null), C = w([]), I = z(
+  const [o, m] = j(((ee = t[0]) == null ? void 0 : ee.name) ?? ""), [c, v] = j(null), [u, p] = j(!1), [i, b] = j(!1), [F, W] = j(!1), Y = w(null), S = w(null), k = w(null), M = w(null), E = w(null), D = w(null), x = w(0), A = w(null), H = w(null), K = w(null), X = w(!1), P = w(!1), R = w(null), C = w([]), I = z(
     () => Math.max(0, t.findIndex((e) => e.name === o)),
     [o, t]
   ), Z = z(
@@ -78,37 +78,37 @@ function He(t, n) {
     K.current !== e && (K.current = e, v(e));
   }, []), q = s(() => {
     var e;
-    N.current !== null && (window.cancelAnimationFrame(N.current), N.current = null), x.current = ((e = Y.current) == null ? void 0 : e.scrollTop) ?? 0;
-  }, []), k = s(() => {
+    M.current !== null && (window.cancelAnimationFrame(M.current), M.current = null), x.current = ((e = S.current) == null ? void 0 : e.scrollTop) ?? 0;
+  }, []), N = s(() => {
     E.current !== null && (window.clearTimeout(E.current), E.current = null), D.current !== null && (window.clearTimeout(D.current), D.current = null);
   }, []), $ = s(
     (e, a = !1) => {
-      var i, h, L;
+      var l, h, L;
       const d = t[e];
-      d && (m(d.name), y(null), a && (q(), (i = C.current[e]) == null || i.scrollIntoView({ block: "nearest", behavior: "auto" }), x.current = ((h = Y.current) == null ? void 0 : h.scrollTop) ?? 0, (L = C.current[e]) == null || L.focus({ preventScroll: !0 })));
+      d && (m(d.name), y(null), a && (q(), (l = C.current[e]) == null || l.scrollIntoView({ block: "nearest", behavior: "auto" }), x.current = ((h = S.current) == null ? void 0 : h.scrollTop) ?? 0, (L = C.current[e]) == null || L.focus({ preventScroll: !0 })));
     },
     [q, y, t]
   ), Q = s(() => {
-    const e = Y.current;
+    const e = S.current;
     if (!e) {
-      N.current = null;
+      M.current = null;
       return;
     }
     const a = x.current - e.scrollTop;
-    if (Math.abs(a) <= ge) {
-      e.scrollTop = x.current, N.current = null;
+    if (Math.abs(a) <= ne) {
+      e.scrollTop = x.current, M.current = null;
       return;
     }
-    e.scrollTop += a * ye, N.current = window.requestAnimationFrame(Q);
+    e.scrollTop += a * ge, M.current = window.requestAnimationFrame(Q);
   }, []), G = s((e) => {
-    const a = Y.current;
+    const a = S.current;
     if (!a)
       return !1;
     const d = a.scrollHeight - a.clientHeight;
     if (d <= 0)
       return !1;
-    const i = N.current === null ? a.scrollTop : x.current, h = Le(i + Ae(e, a), d);
-    return x.current = h, X.current ? (a.scrollTop = h, !0) : (N.current === null && (N.current = window.requestAnimationFrame(Q)), !0);
+    const l = M.current === null ? a.scrollTop : x.current, h = Le(l + Ae(e, a), d);
+    return Math.abs(h - l) <= ne ? !1 : (x.current = h, X.current ? (a.scrollTop = h, !0) : (M.current === null && (M.current = window.requestAnimationFrame(Q)), !0));
   }, [Q]);
   O(() => {
     const e = S.current;
@@ -122,122 +122,117 @@ function He(t, n) {
     };
   }, [G]);
   const g = s(() => {
-    M.current !== null && (window.cancelAnimationFrame(M.current), M.current = null), A.current = null, H.current = null;
-    const e = S.current;
+    k.current !== null && (window.cancelAnimationFrame(k.current), k.current = null), A.current = null, H.current = null;
+    const e = Y.current;
     e && (e.style.removeProperty("--workbench-rotate-x"), e.style.removeProperty("--workbench-rotate-y"), e.style.removeProperty("--workbench-rotate-z"), e.style.removeProperty("--workbench-shift-x"), e.style.removeProperty("--workbench-shift-y"), e.style.removeProperty("--workbench-origin-x"), e.style.removeProperty("--workbench-origin-y"));
   }, []), V = s(() => {
-    const e = S.current, a = H.current;
+    const e = Y.current, a = H.current;
     if (!e || !a) {
-      M.current = null;
+      k.current = null;
       return;
     }
-    const d = A.current ?? Re(a.pointerType), i = Xe(d, a), h = Fe(i, a) <= xe ? a : i;
+    const d = A.current ?? Re(a.pointerType), l = Xe(d, a), h = Fe(l, a) <= xe ? a : l;
     if (A.current = h, De(e, h), h === a) {
-      M.current = null;
+      k.current = null;
       return;
     }
-    M.current = window.requestAnimationFrame(V);
+    k.current = window.requestAnimationFrame(V);
   }, []), J = s((e, a, d) => {
     if (X.current) {
       g();
       return;
     }
-    const i = e / window.innerWidth - 0.5, h = a / window.innerHeight - 0.5, L = d === "touch" ? 0.86 : 1;
+    const l = e / window.innerWidth - 0.5, h = a / window.innerHeight - 0.5, L = d === "touch" ? 0.86 : 1;
     H.current = {
       pointerType: d,
       rotateX: -h * ve * L * U,
-      rotateY: i * ae * L * U,
-      rotateZ: i * Ne * L * U,
-      shiftX: i * ke * L,
-      shiftY: h * Me * L
-    }, M.current === null && (M.current = window.requestAnimationFrame(V));
+      rotateY: l * le * L * U,
+      rotateZ: l * Me * L * U,
+      shiftX: l * Ne * L,
+      shiftY: h * ke * L
+    }, k.current === null && (k.current = window.requestAnimationFrame(V));
   }, [U, g, V]), T = s(
     (e, a, d) => {
       if (X.current) {
-        k(), W(!1), b(!1), g();
+        N(), W(!1), b(!1), g();
         return;
       }
-      k(), W(!1), b(!0), J(e, a, d);
+      N(), W(!1), b(!0), J(e, a, d);
     },
-    [k, g, J]
+    [N, g, J]
   );
   O(() => {
     const e = window.matchMedia("(prefers-reduced-motion: reduce)"), a = () => {
-      X.current = e.matches, e.matches && (k(), W(!1), g());
+      X.current = e.matches, e.matches && (N(), W(!1), g());
     };
     return a(), e.addEventListener("change", a), () => {
       e.removeEventListener("change", a);
     };
-  }, [k, g]), O(
+  }, [N, g]), O(
     () => () => {
-      q(), k(), g();
+      q(), N(), g();
     },
-    [q, k, g]
+    [q, N, g]
   );
-  const le = s(
+  const ie = s(
     (e) => (a) => {
       C.current[e] = a;
     },
     []
   );
   O(() => {
-    const e = (i) => {
-      ["ArrowDown", "ArrowUp", "End", "Home", "Tab"].includes(i.key) && (P.current = !0);
+    const e = (l) => {
+      ["ArrowDown", "ArrowUp", "End", "Home", "Tab"].includes(l.key) && (P.current = !0);
     }, a = () => {
       P.current = !1;
-    }, d = (i) => {
+    }, d = (l) => {
       var h;
-      if (!(i.pointerType === "touch" && R.current !== i.pointerId)) {
+      if (!(l.pointerType === "touch" && R.current !== l.pointerId)) {
         if (X.current) {
-          k(), W(!1), b(!1), g();
+          N(), W(!1), b(!1), g();
           return;
         }
-        P.current && ((h = S.current) != null && h.contains(document.activeElement)) && p(!0), T(i.clientX, i.clientY, i.pointerType);
+        P.current && ((h = Y.current) != null && h.contains(document.activeElement)) && p(!0), T(l.clientX, l.clientY, l.pointerType);
       }
     };
     return window.addEventListener("keydown", e, { passive: !0 }), window.addEventListener("pointerdown", a, { passive: !0 }), window.addEventListener("pointermove", d, { passive: !0 }), () => {
       window.removeEventListener("keydown", e), window.removeEventListener("pointerdown", a), window.removeEventListener("pointermove", d);
     };
-  }, [k, g, T]);
-  const ie = s((e) => {
+  }, [N, g, T]);
+  const se = s((e) => {
     e.currentTarget.contains(e.relatedTarget) || (P.current = !1, p(!1), y(null));
-  }, [y]), se = s(() => {
+  }, [y]), ce = s(() => {
     P.current && p(!0);
-  }, []), ce = s((e) => {
+  }, []), de = s((e) => {
     p(!1), y(null), !(e.pointerType === "touch" && R.current !== e.pointerId) && T(e.clientX, e.clientY, e.pointerType);
-  }, [y, T]), de = s(
+  }, [y, T]), ue = s(
     (e) => {
       p(!0), T(e.clientX, e.clientY, e.pointerType);
     },
     [T]
-  ), ue = s(
+  ), he = s(
     (e) => {
       P.current = !1, p(!0), e.pointerType === "touch" && (R.current = e.pointerId), T(e.clientX, e.clientY, e.pointerType);
     },
     [T]
   ), _ = s((e) => {
     if (e.pointerType === "touch" && R.current === e.pointerId) {
-      const a = S.current;
-      a && a.style.setProperty("--workbench-touch-return-ms", `${B.durationMs}ms`), R.current = null, b(!1), W(!0), k(), E.current = window.setTimeout(() => {
+      const a = Y.current;
+      a && a.style.setProperty("--workbench-touch-return-ms", `${B.durationMs}ms`), R.current = null, b(!1), W(!0), N(), E.current = window.setTimeout(() => {
         E.current = null, g(), D.current = window.setTimeout(() => {
           D.current = null, W(!1);
         }, B.durationMs);
       }, B.holdMs);
     }
-  }, [k, g, B.durationMs, B.holdMs]), he = s(
+  }, [N, g, B.durationMs, B.holdMs]), fe = s(
     (e) => {
-      var i;
+      var l;
       if (e.pointerType === "touch")
         return;
-      const a = $e(e.target), d = a === null ? null : ((i = t[a]) == null ? void 0 : i.name) ?? null;
+      const a = $e(e.target), d = a === null ? null : ((l = t[a]) == null ? void 0 : l.name) ?? null;
       y(d);
     },
     [t, y]
-  ), fe = s(
-    (e) => {
-      e.pointerType !== "touch" && y(null);
-    },
-    [y]
   ), me = s(
     (e) => {
       e.pointerType !== "touch" && y(null);
@@ -245,10 +240,15 @@ function He(t, n) {
     [y]
   ), pe = s(
     (e) => {
+      e.pointerType !== "touch" && y(null);
+    },
+    [y]
+  ), we = s(
+    (e) => {
       e.pointerType === "touch" && R.current !== e.pointerId || (p(!0), T(e.clientX, e.clientY, e.pointerType));
     },
     [T]
-  ), we = s(
+  ), be = s(
     (e) => {
       P.current = !0, p(!0), e.key === "ArrowDown" && (e.preventDefault(), $(Math.min(I + 1, t.length - 1), !0)), e.key === "ArrowUp" && (e.preventDefault(), $(Math.max(I - 1, 0), !0)), e.key === "Home" && (e.preventDefault(), $(0, !0)), e.key === "End" && (e.preventDefault(), $(t.length - 1, !0));
     },
@@ -256,29 +256,29 @@ function He(t, n) {
   );
   return {
     activeItem: Z,
-    artifactRef: S,
-    handleItemListPointerLeave: fe,
-    handleItemListPointerMove: he,
-    handleSelectedPanelPointerEnter: me,
-    handleWorkbenchBlur: ie,
-    handleWorkbenchFocus: se,
-    handleWorkbenchKeyDown: we,
+    artifactRef: Y,
+    handleItemListPointerLeave: me,
+    handleItemListPointerMove: fe,
+    handleSelectedPanelPointerEnter: pe,
+    handleWorkbenchBlur: se,
+    handleWorkbenchFocus: ce,
+    handleWorkbenchKeyDown: be,
     handleWorkbenchPointerCancel: _,
-    handleWorkbenchPointerDown: ue,
-    handleWorkbenchPointerEnter: de,
-    handleWorkbenchPointerLeave: ce,
-    handleWorkbenchPointerMove: pe,
+    handleWorkbenchPointerDown: he,
+    handleWorkbenchPointerEnter: ue,
+    handleWorkbenchPointerLeave: de,
+    handleWorkbenchPointerMove: we,
     handleWorkbenchPointerUp: _,
     isWorkbenchEngaged: u,
     isWorkbenchSettling: F,
-    isWorkbenchTracking: l,
-    listRef: Y,
+    isWorkbenchTracking: i,
+    listRef: S,
     previewedItemName: c,
-    registerRow: le,
+    registerRow: ie,
     selectItem: $
   };
 }
-function re({ className: t = "showcase-detail", id: n, item: o }) {
+function oe({ className: t = "showcase-detail", id: n, item: o }) {
   var v;
   const m = `${n}-title`, c = o.metadata ?? ((v = o.destination) != null && v.type ? [o.destination.type] : []);
   return /* @__PURE__ */ f("div", { "aria-labelledby": m, "aria-live": "polite", className: t, id: n, role: "region", children: [
@@ -315,12 +315,12 @@ function Ze({
   setRef: u
 }) {
   var b, F;
-  const p = ["workbench-row", o ? "is-active" : "", m ? "is-previewed" : ""].filter(Boolean).join(" "), l = `${c.slug}-summary`;
+  const p = ["workbench-row", o ? "is-active" : "", m ? "is-previewed" : ""].filter(Boolean).join(" "), i = `${c.slug}-summary`;
   return /* @__PURE__ */ f(
     "button",
     {
       "aria-controls": t,
-      "aria-describedby": l,
+      "aria-describedby": i,
       "aria-pressed": o,
       className: p,
       "data-showcase-index": n,
@@ -333,14 +333,14 @@ function Ze({
         /* @__PURE__ */ f("div", { children: [
           /* @__PURE__ */ r("strong", { children: c.name }),
           /* @__PURE__ */ r("p", { children: c.summary }),
-          /* @__PURE__ */ r("small", { id: l, children: ((F = (b = c.details) == null ? void 0 : b[0]) == null ? void 0 : F.value) ?? c.summary })
+          /* @__PURE__ */ r("small", { id: i, children: ((F = (b = c.details) == null ? void 0 : b[0]) == null ? void 0 : F.value) ?? c.summary })
         ] }),
         /* @__PURE__ */ r("em", { children: c.signal })
       ]
     }
   );
 }
-function oe({ title: t }) {
+function ae({ title: t }) {
   return /* @__PURE__ */ f("div", { className: "window-bar", children: [
     /* @__PURE__ */ r("span", {}),
     /* @__PURE__ */ r("span", {}),
@@ -354,14 +354,14 @@ function Be({ id: t, workbench: n }) {
     artifactRef: v,
     handleItemListPointerLeave: u,
     handleItemListPointerMove: p,
-    handleSelectedPanelPointerEnter: l,
+    handleSelectedPanelPointerEnter: i,
     handleWorkbenchBlur: b,
     handleWorkbenchFocus: F,
     handleWorkbenchKeyDown: W,
-    handleWorkbenchPointerCancel: S,
-    handleWorkbenchPointerDown: Y,
-    handleWorkbenchPointerEnter: M,
-    handleWorkbenchPointerLeave: N,
+    handleWorkbenchPointerCancel: Y,
+    handleWorkbenchPointerDown: S,
+    handleWorkbenchPointerEnter: k,
+    handleWorkbenchPointerLeave: M,
     handleWorkbenchPointerMove: E,
     handleWorkbenchPointerUp: D,
     isWorkbenchEngaged: x,
@@ -385,16 +385,16 @@ function Be({ id: t, workbench: n }) {
       "aria-label": n.ariaLabel ?? "Showcase index",
       onBlur: b,
       onFocus: F,
-      onPointerCancel: S,
-      onPointerDown: Y,
-      onPointerEnter: M,
-      onPointerLeave: N,
+      onPointerCancel: Y,
+      onPointerDown: S,
+      onPointerEnter: k,
+      onPointerLeave: M,
       onPointerMove: E,
       onPointerUp: D,
       ref: v,
       children: /* @__PURE__ */ r("div", { className: "hero-art-stage", children: /* @__PURE__ */ f("div", { className: "hero-art-motion-layer", children: [
         /* @__PURE__ */ f("div", { className: "artifact-window artifact-window-main", onKeyDown: W, children: [
-          /* @__PURE__ */ r(oe, { title: n.title }),
+          /* @__PURE__ */ r(ae, { title: n.title }),
           /* @__PURE__ */ f("div", { className: "workbench-panel", children: [
             /* @__PURE__ */ f("div", { className: "workbench-summary", children: [
               /* @__PURE__ */ r("span", { children: n.eyebrow ?? "showcase index" }),
@@ -425,7 +425,7 @@ function Be({ id: t, workbench: n }) {
             /* @__PURE__ */ f("div", { className: "mobile-showcase-panel", children: [
               /* @__PURE__ */ r("div", { className: "mini-heading", children: n.selectedLabel ?? "selected item" }),
               /* @__PURE__ */ r(
-                re,
+                oe,
                 {
                   className: "showcase-detail showcase-detail-inline",
                   id: m,
@@ -439,11 +439,11 @@ function Be({ id: t, workbench: n }) {
           "div",
           {
             className: "artifact-window artifact-window-side",
-            onPointerEnter: l,
-            onPointerMove: l,
+            onPointerEnter: i,
+            onPointerMove: i,
             children: [
               /* @__PURE__ */ r("div", { className: "mini-heading", children: n.selectedLabel ?? "selected item" }),
-              /* @__PURE__ */ r(re, { id: o, item: c })
+              /* @__PURE__ */ r(oe, { id: o, item: c })
             ]
           }
         ),
@@ -451,7 +451,7 @@ function Be({ id: t, workbench: n }) {
       ] }) })
     }
   ) : /* @__PURE__ */ r("div", { className: "hero-art", id: t, "aria-label": n.ariaLabel ?? "Showcase index", children: /* @__PURE__ */ r("div", { className: "hero-art-stage", children: /* @__PURE__ */ r("div", { className: "hero-art-motion-layer", children: /* @__PURE__ */ f("div", { className: "artifact-window artifact-window-main", children: [
-    /* @__PURE__ */ r(oe, { title: n.title }),
+    /* @__PURE__ */ r(ae, { title: n.title }),
     /* @__PURE__ */ r("div", { className: "workbench-panel", children: /* @__PURE__ */ f("div", { className: "workbench-summary", children: [
       /* @__PURE__ */ r("span", { children: n.eyebrow ?? "showcase index" }),
       /* @__PURE__ */ r("strong", { children: n.emptyState ?? n.caption })
@@ -479,23 +479,23 @@ function Qe({
   return /* @__PURE__ */ f("section", { className: p, id: m, "aria-labelledby": v, children: [
     /* @__PURE__ */ r("div", { className: "hero-noise", "aria-hidden": "true" }),
     /* @__PURE__ */ r("div", { className: "hero-grid", "aria-hidden": "true" }),
-    c.length > 0 ? /* @__PURE__ */ r("div", { className: "hero-orbit", "aria-hidden": "true", children: c.map((l, b) => /* @__PURE__ */ r("span", { className: qe(l.className, b), children: l.label }, `${l.className ?? b}-${l.label}`)) }) : null,
+    c.length > 0 ? /* @__PURE__ */ r("div", { className: "hero-orbit", "aria-hidden": "true", children: c.map((i, b) => /* @__PURE__ */ r("span", { className: qe(i.className, b), children: i.label }, `${i.className ?? b}-${i.label}`)) }) : null,
     /* @__PURE__ */ f("div", { className: "hero-copy", children: [
       /* @__PURE__ */ r("p", { className: "eyebrow", children: o.eyebrow }),
       /* @__PURE__ */ r("h1", { id: v, children: o.name }),
       /* @__PURE__ */ r("p", { className: "hero-statement", children: o.statement }),
       /* @__PURE__ */ r("p", { className: "hero-detail", children: o.detail }),
-      t.length > 0 ? /* @__PURE__ */ r("div", { className: "hero-actions", "aria-label": "Primary actions", children: t.map((l) => /* @__PURE__ */ r(
+      t.length > 0 ? /* @__PURE__ */ r("div", { className: "hero-actions", "aria-label": "Primary actions", children: t.map((i) => /* @__PURE__ */ r(
         "a",
         {
-          "aria-label": l.ariaLabel,
-          className: Ue(l.variant, l.className),
-          href: l.href,
-          rel: l.rel,
-          target: l.target,
-          children: l.label
+          "aria-label": i.ariaLabel,
+          className: Ue(i.variant, i.className),
+          href: i.href,
+          rel: i.rel,
+          target: i.target,
+          children: i.label
         },
-        `${l.href}-${l.label}`
+        `${i.href}-${i.label}`
       )) }) : null
     ] }),
     u ? /* @__PURE__ */ r(Be, { id: u.id ?? Ke, workbench: u }) : null
