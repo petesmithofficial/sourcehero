@@ -275,6 +275,8 @@
   --workbench-rotate-z: 0deg;
   --workbench-shift-x: 0px;
   --workbench-shift-y: 0px;
+  --workbench-origin-x: 50%;
+  --workbench-origin-y: 46%;
   position: relative;
   z-index: 2;
   width: min(72vw, 920px);
@@ -286,6 +288,7 @@
   grid-template-columns: minmax(0, 1fr);
   perspective: 1400px;
   perspective-origin: 50% 42%;
+  touch-action: pan-y;
 }
 
 .showcase-hero .hero-art::before {
@@ -305,8 +308,14 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+}
+
+.showcase-hero .hero-art-motion-layer {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   transform-style: preserve-3d;
-  transform-origin: 50% 46%;
+  transform-origin: var(--workbench-origin-x) var(--workbench-origin-y);
   transform:
     rotateX(var(--workbench-rotate-x))
     rotateY(var(--workbench-rotate-y))
@@ -315,6 +324,11 @@
   transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
   animation: showcase-hero-workbench-idle-rotation 11s cubic-bezier(0.45, 0, 0.25, 1) infinite;
   will-change: transform;
+}
+
+.showcase-hero .hero-art.is-workbench-tracking .hero-art-motion-layer {
+  animation: none;
+  transition-duration: 90ms;
 }
 
 .showcase-hero .artifact-window {
@@ -617,6 +631,7 @@
   min-height: 0;
   overflow: visible;
   padding: 1rem;
+  transform: translate3d(0, 0, 2px);
 }
 
 .showcase-hero .showcase-detail {
@@ -751,15 +766,8 @@
   text-transform: uppercase;
 }
 
-.showcase-hero .hero-art.is-workbench-engaged .hero-art-stage,
-.showcase-hero .hero-art.is-workbench-tracking .hero-art-stage,
 .showcase-hero .hero-art.is-workbench-engaged .metric-strip {
   animation-play-state: paused;
-}
-
-.showcase-hero .hero-art.is-workbench-engaged .hero-art-stage,
-.showcase-hero .hero-art.is-workbench-tracking .hero-art-stage {
-  animation: none;
 }
 
 @keyframes showcase-hero-workbench-idle-rotation {

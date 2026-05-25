@@ -40,6 +40,9 @@ export type ShowcaseHeroItem = {
     slug: string;
     summary: string;
 };
+export type ShowcaseHeroMotion = {
+    maxTiltDegrees?: number;
+};
 export type ShowcaseHeroWorkbench = {
     ariaLabel?: string;
     caption: string;
@@ -48,6 +51,7 @@ export type ShowcaseHeroWorkbench = {
     id?: string;
     items: readonly ShowcaseHeroItem[];
     listLabel?: string;
+    motion?: ShowcaseHeroMotion;
     selectedLabel?: string;
     tags?: readonly string[];
     title: string;

@@ -1,3 +1,3 @@
 export { ShowcaseHero } from "./ShowcaseHero";
-export type { ShowcaseHeroAction, ShowcaseHeroActionVariant, ShowcaseHeroContent, ShowcaseHeroItem, ShowcaseHeroItemDestination, ShowcaseHeroItemDetail, ShowcaseHeroOrbitTile, ShowcaseHeroProps, ShowcaseHeroWorkbench, } from "./types";
+export type { ShowcaseHeroAction, ShowcaseHeroActionVariant, ShowcaseHeroContent, ShowcaseHeroItem, ShowcaseHeroItemDestination, ShowcaseHeroItemDetail, ShowcaseHeroMotion, ShowcaseHeroOrbitTile, ShowcaseHeroProps, ShowcaseHeroWorkbench, } from "./types";
 //# sourceMappingURL=index.d.ts.map

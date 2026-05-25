@@ -4,6 +4,8 @@
 
 The component is intentionally data-driven. It can present products, case studies, talks, writing, demos, downloads, technical references, or any other selected set of work.
 
+![ShowcaseHero demo preview](docs/showcasehero-preview.png)
+
 ## Install
 
 ```sh
@@ -50,6 +52,7 @@ const hero: ShowcaseHeroProps = {
       },
     ],
     listLabel: "Selectable showcase items",
+    motion: { maxTiltDegrees: 6 },
     selectedLabel: "selected item",
     tags: ["typed props", "responsive", "themeable"],
     title: "selected work",
@@ -69,6 +72,7 @@ export function Page() {
 - `actions`: primary or secondary hero links.
 - `orbitTiles`: optional floating labels. The first four tiles get default positions.
 - `workbench`: optional interactive index with `items`, item metadata, arbitrary detail rows, signal text, tags, and destination links.
+- `workbench.motion.maxTiltDegrees`: optional cap for the pointer-following workbench rotation. Omit it to use the default motion. Providing it only changes rotation amplitude; pointer tracking, translation, hover behavior, and timing stay the same.
 
 Each showcase item uses neutral fields:
 

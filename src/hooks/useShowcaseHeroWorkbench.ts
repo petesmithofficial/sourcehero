@@ -6,10 +6,9 @@ import {
   useState,
   type FocusEvent,
   type KeyboardEvent,
-  type MouseEvent,
   type PointerEvent,
 } from "react";
-import type { ShowcaseHeroItem } from "../types";
+import type { ShowcaseHeroItem, ShowcaseHeroMotion } from "../types";
 
 const wheelDeltaMode = {
   line: 1,
@@ -18,9 +17,42 @@ const wheelDeltaMode = {
 const wheelLineHeight = 18;
 const smoothScrollEase = 0.26;
 const smoothScrollSnapDistance = 0.35;
+const defaultRotateXMultiplier = 13;
+const defaultRotateYMultiplier = 16;
+const defaultRotateZMultiplier = 0.72;
+const defaultShiftXMultiplier = 18;
+const defaultShiftYMultiplier = 16;
+const defaultMaxTiltDegrees = defaultRotateYMultiplier * 0.5;
 
 function clampScrollTop(nextScrollTop: number, maxScrollTop: number) {
   return Math.min(Math.max(nextScrollTop, 0), maxScrollTop);
+}
+
+function resolveMotionScale(motion: ShowcaseHeroMotion | undefined) {
+  const maxTiltDegrees = motion?.maxTiltDegrees;
+
+  if (typeof maxTiltDegrees !== "number" || !Number.isFinite(maxTiltDegrees) || maxTiltDegrees <= 0) {
+    return 1;
+  }
+
+  return maxTiltDegrees / defaultMaxTiltDegrees;
+}
+
+function getItemIndexFromTarget(target: EventTarget | null) {
+  if (!(target instanceof Element)) {
+    return null;
+  }
+
+  const row = target.closest<HTMLElement>("[data-showcase-index]");
+  const index = row?.dataset.showcaseIndex;
+
+  if (!index) {
+    return null;
+  }
+
+  const parsedIndex = Number.parseInt(index, 10);
+
+  return Number.isNaN(parsedIndex) ? null : parsedIndex;
 }
 
 function normalizeWheelDelta(event: WheelEvent, list: HTMLOListElement) {
@@ -35,7 +67,7 @@ function normalizeWheelDelta(event: WheelEvent, list: HTMLOListElement) {
   return event.deltaY;
 }
 
-export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
+export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], motion?: ShowcaseHeroMotion) {
   const [activeItemName, setActiveItemName] = useState(items[0]?.name ?? "");
   const [previewedItemName, setPreviewedItemName] = useState<string | null>(null);
   const [isWorkbenchEngaged, setIsWorkbenchEngaged] = useState(false);
@@ -45,12 +77,11 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
   const motionFrame = useRef<number | null>(null);
   const scrollFrame = useRef<number | null>(null);
   const targetScrollTop = useRef(0);
-  const pendingMotionPoint = useRef<{ clientX: number; clientY: number } | null>(null);
-  const pendingPreviewPoint = useRef<{ clientX: number; clientY: number } | null>(null);
-  const previewFrame = useRef<number | null>(null);
+  const pendingMotionPoint = useRef<{ clientX: number; clientY: number; pointerType: string } | null>(null);
   const previewedItemNameRef = useRef<string | null>(null);
   const prefersReducedMotionRef = useRef(false);
   const isKeyboardFocusRef = useRef(false);
+  const activeTouchPointerIdRef = useRef<number | null>(null);
   const rowRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const activeItemIndex = useMemo(
@@ -61,6 +92,7 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
     () => items.find((item) => item.name === activeItemName) ?? items[0],
     [activeItemName, items],
   );
+  const motionScale = useMemo(() => resolveMotionScale(motion), [motion]);
 
   const previewItem = useCallback((nextItemName: string | null) => {
     if (previewedItemNameRef.current === nextItemName) {
@@ -174,15 +206,6 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
     };
   }, [scrollItemList]);
 
-  const cancelPendingPreview = useCallback(() => {
-    if (previewFrame.current !== null) {
-      window.cancelAnimationFrame(previewFrame.current);
-      previewFrame.current = null;
-    }
-
-    pendingPreviewPoint.current = null;
-  }, []);
-
   const resetWorkbenchMotion = useCallback(() => {
     if (motionFrame.current !== null) {
       window.cancelAnimationFrame(motionFrame.current);
@@ -202,15 +225,17 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
     artifact.style.removeProperty("--workbench-rotate-z");
     artifact.style.removeProperty("--workbench-shift-x");
     artifact.style.removeProperty("--workbench-shift-y");
+    artifact.style.removeProperty("--workbench-origin-x");
+    artifact.style.removeProperty("--workbench-origin-y");
   }, []);
 
-  const setWorkbenchMotionTarget = useCallback((clientX: number, clientY: number) => {
+  const setWorkbenchMotionTarget = useCallback((clientX: number, clientY: number, pointerType: string) => {
     if (prefersReducedMotionRef.current) {
       resetWorkbenchMotion();
       return;
     }
 
-    pendingMotionPoint.current = { clientX, clientY };
+    pendingMotionPoint.current = { clientX, clientY, pointerType };
 
     if (motionFrame.current !== null) {
       return;
@@ -229,11 +254,12 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
 
       const x = point.clientX / window.innerWidth - 0.5;
       const y = point.clientY / window.innerHeight - 0.5;
-      const rotateX = -y * 13;
-      const rotateY = x * 16;
-      const rotateZ = x * 0.72;
-      const shiftX = x * 18;
-      const shiftY = y * 16;
+      const pointerScale = point.pointerType === "touch" ? 0.86 : 1;
+      const rotateX = -y * defaultRotateXMultiplier * pointerScale * motionScale;
+      const rotateY = x * defaultRotateYMultiplier * pointerScale * motionScale;
+      const rotateZ = x * defaultRotateZMultiplier * pointerScale * motionScale;
+      const shiftX = x * defaultShiftXMultiplier * pointerScale;
+      const shiftY = y * defaultShiftYMultiplier * pointerScale;
 
       artifact.style.setProperty("--workbench-rotate-x", `${rotateX.toFixed(2)}deg`);
       artifact.style.setProperty("--workbench-rotate-y", `${rotateY.toFixed(2)}deg`);
@@ -241,7 +267,21 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
       artifact.style.setProperty("--workbench-shift-x", `${shiftX.toFixed(2)}px`);
       artifact.style.setProperty("--workbench-shift-y", `${shiftY.toFixed(2)}px`);
     });
-  }, [resetWorkbenchMotion]);
+  }, [motionScale, resetWorkbenchMotion]);
+
+  const trackWorkbenchMotion = useCallback(
+    (clientX: number, clientY: number, pointerType: string) => {
+      if (prefersReducedMotionRef.current) {
+        setIsWorkbenchTracking(false);
+        resetWorkbenchMotion();
+        return;
+      }
+
+      setIsWorkbenchTracking(true);
+      setWorkbenchMotionTarget(clientX, clientY, pointerType);
+    },
+    [resetWorkbenchMotion, setWorkbenchMotionTarget],
+  );
 
   useEffect(() => {
     const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -263,11 +303,10 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
 
   useEffect(
     () => () => {
-      cancelPendingPreview();
       cancelSmoothItemScroll();
       resetWorkbenchMotion();
     },
-    [cancelPendingPreview, cancelSmoothItemScroll, resetWorkbenchMotion],
+    [cancelSmoothItemScroll, resetWorkbenchMotion],
   );
 
   const registerRow = useCallback(
@@ -276,24 +315,6 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
     },
     [],
   );
-
-  const isPointInsideWorkbenchZone = useCallback((clientX: number, clientY: number) => {
-    const artifact = artifactRef.current;
-
-    if (!artifact) {
-      return false;
-    }
-
-    const rect = artifact.getBoundingClientRect();
-    const pauseDeadband = 24;
-
-    return (
-      clientX >= rect.left - pauseDeadband &&
-      clientX <= rect.right + pauseDeadband &&
-      clientY >= rect.top - pauseDeadband &&
-      clientY <= rect.bottom + pauseDeadband
-    );
-  }, []);
 
   useEffect(() => {
     const handleWindowKeyDown = (event: globalThis.KeyboardEvent) => {
@@ -307,30 +328,21 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
     };
 
     const handleWindowPointerMove = (event: globalThis.PointerEvent) => {
-      if (event.pointerType === "touch") {
+      if (event.pointerType === "touch" && activeTouchPointerIdRef.current !== event.pointerId) {
         return;
       }
 
       if (prefersReducedMotionRef.current) {
         setIsWorkbenchTracking(false);
-        setIsWorkbenchEngaged(isPointInsideWorkbenchZone(event.clientX, event.clientY));
+        resetWorkbenchMotion();
         return;
       }
 
       if (isKeyboardFocusRef.current && artifactRef.current?.contains(document.activeElement)) {
         setIsWorkbenchEngaged(true);
-        return;
       }
 
-      if (isPointInsideWorkbenchZone(event.clientX, event.clientY)) {
-        setIsWorkbenchEngaged(true);
-        setIsWorkbenchTracking(false);
-        return;
-      }
-
-      setIsWorkbenchEngaged(false);
-      setIsWorkbenchTracking(true);
-      setWorkbenchMotionTarget(event.clientX, event.clientY);
+      trackWorkbenchMotion(event.clientX, event.clientY, event.pointerType);
     };
 
     window.addEventListener("keydown", handleWindowKeyDown, { passive: true });
@@ -342,148 +354,111 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
       window.removeEventListener("pointerdown", handleWindowPointerDown);
       window.removeEventListener("pointermove", handleWindowPointerMove);
     };
-  }, [isPointInsideWorkbenchZone, setWorkbenchMotionTarget]);
-
-  const resolveItemIndexAtPoint = useCallback(
-    (clientX: number, clientY: number) => {
-      const list = listRef.current;
-      const currentItemName = previewedItemNameRef.current;
-
-      if (!list) {
-        return null;
-      }
-
-      const listRect = list.getBoundingClientRect();
-      const listDeadband = 8;
-
-      if (
-        clientX < listRect.left - listDeadband ||
-        clientX > listRect.right + listDeadband ||
-        clientY < listRect.top - listDeadband ||
-        clientY > listRect.bottom + listDeadband
-      ) {
-        return null;
-      }
-
-      const directRowIndex = rowRefs.current.findIndex((row) => {
-        if (!row) {
-          return false;
-        }
-
-        const rowRect = row.getBoundingClientRect();
-        return clientY >= rowRect.top && clientY <= rowRect.bottom;
-      });
-
-      if (directRowIndex >= 0) {
-        return directRowIndex;
-      }
-
-      if (currentItemName) {
-        const currentItemIndex = items.findIndex((item) => item.name === currentItemName);
-        const currentRow = rowRefs.current[currentItemIndex];
-
-        if (currentRow) {
-          const rowRect = currentRow.getBoundingClientRect();
-          const rowDeadband = 10;
-
-          if (clientY >= rowRect.top - rowDeadband && clientY <= rowRect.bottom + rowDeadband) {
-            return currentItemIndex;
-          }
-        }
-      }
-
-      return currentItemName ? items.findIndex((item) => item.name === currentItemName) : null;
-    },
-    [items],
-  );
-
-  const previewItemAtPoint = useCallback(
-    (clientX: number, clientY: number) => {
-      const nextItemIndex = resolveItemIndexAtPoint(clientX, clientY);
-      const nextItemName = nextItemIndex === null || nextItemIndex < 0 ? null : items[nextItemIndex]?.name ?? null;
-
-      previewItem(nextItemName);
-    },
-    [previewItem, items, resolveItemIndexAtPoint],
-  );
-
-  const schedulePreviewItemAtPoint = useCallback(
-    (clientX: number, clientY: number) => {
-      pendingPreviewPoint.current = { clientX, clientY };
-
-      if (previewFrame.current !== null) {
-        return;
-      }
-
-      previewFrame.current = window.requestAnimationFrame(() => {
-        const point = pendingPreviewPoint.current;
-
-        previewFrame.current = null;
-        pendingPreviewPoint.current = null;
-
-        if (point) {
-          previewItemAtPoint(point.clientX, point.clientY);
-        }
-      });
-    },
-    [previewItemAtPoint],
-  );
+  }, [resetWorkbenchMotion, trackWorkbenchMotion]);
 
   const handleWorkbenchBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
-      cancelPendingPreview();
       isKeyboardFocusRef.current = false;
       setIsWorkbenchEngaged(false);
       previewItem(null);
     }
-  }, [cancelPendingPreview, previewItem]);
+  }, [previewItem]);
 
   const handleWorkbenchFocus = useCallback(() => {
     if (isKeyboardFocusRef.current) {
       setIsWorkbenchEngaged(true);
-      setIsWorkbenchTracking(false);
     }
   }, []);
 
   const handleWorkbenchPointerLeave = useCallback((event: PointerEvent<HTMLDivElement>) => {
-    cancelPendingPreview();
     setIsWorkbenchEngaged(false);
-    setIsWorkbenchTracking(true);
-    setWorkbenchMotionTarget(event.clientX, event.clientY);
     previewItem(null);
-  }, [cancelPendingPreview, previewItem, setWorkbenchMotionTarget]);
+
+    if (event.pointerType === "touch" && activeTouchPointerIdRef.current !== event.pointerId) {
+      return;
+    }
+
+    trackWorkbenchMotion(event.clientX, event.clientY, event.pointerType);
+  }, [previewItem, trackWorkbenchMotion]);
 
   const handleWorkbenchPointerEnter = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
+      setIsWorkbenchEngaged(true);
+      trackWorkbenchMotion(event.clientX, event.clientY, event.pointerType);
+    },
+    [trackWorkbenchMotion],
+  );
+
+  const handleWorkbenchPointerDown = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      isKeyboardFocusRef.current = false;
+      setIsWorkbenchEngaged(true);
+
+      if (event.pointerType === "touch") {
+        activeTouchPointerIdRef.current = event.pointerId;
+      }
+
+      trackWorkbenchMotion(event.clientX, event.clientY, event.pointerType);
+    },
+    [trackWorkbenchMotion],
+  );
+
+  const releaseTouchPointer = useCallback((event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "touch" && activeTouchPointerIdRef.current === event.pointerId) {
+      activeTouchPointerIdRef.current = null;
+      setIsWorkbenchTracking(false);
+    }
+  }, []);
+
+  const handleItemListPointerMove = useCallback(
+    (event: PointerEvent<HTMLOListElement>) => {
       if (event.pointerType === "touch") {
         return;
       }
 
-      setIsWorkbenchEngaged(true);
-      setIsWorkbenchTracking(false);
-      schedulePreviewItemAtPoint(event.clientX, event.clientY);
+      // Keep preview ownership inside the list; selected-panel links should not affect row hover.
+      const nextItemIndex = getItemIndexFromTarget(event.target);
+      const nextItemName = nextItemIndex === null ? null : items[nextItemIndex]?.name ?? null;
+
+      previewItem(nextItemName);
     },
-    [schedulePreviewItemAtPoint],
+    [items, previewItem],
+  );
+
+  const handleItemListPointerLeave = useCallback(
+    (event: PointerEvent<HTMLOListElement>) => {
+      if (event.pointerType !== "touch") {
+        previewItem(null);
+      }
+    },
+    [previewItem],
+  );
+
+  const handleSelectedPanelPointerEnter = useCallback(
+    (event: PointerEvent<HTMLDivElement>) => {
+      if (event.pointerType !== "touch") {
+        previewItem(null);
+      }
+    },
+    [previewItem],
   );
 
   const handleWorkbenchPointerMove = useCallback(
     (event: PointerEvent<HTMLDivElement>) => {
-      if (event.pointerType === "touch") {
+      if (event.pointerType === "touch" && activeTouchPointerIdRef.current !== event.pointerId) {
         return;
       }
 
       setIsWorkbenchEngaged(true);
-      setIsWorkbenchTracking(false);
-      schedulePreviewItemAtPoint(event.clientX, event.clientY);
+      trackWorkbenchMotion(event.clientX, event.clientY, event.pointerType);
     },
-    [schedulePreviewItemAtPoint],
+    [trackWorkbenchMotion],
   );
 
   const handleWorkbenchKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
       isKeyboardFocusRef.current = true;
       setIsWorkbenchEngaged(true);
-      setIsWorkbenchTracking(false);
 
       if (event.key === "ArrowDown") {
         event.preventDefault();
@@ -508,35 +483,21 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[]) {
     [activateItem, activeItemIndex, items.length],
   );
 
-  const handleItemListClick = useCallback(
-    (event: MouseEvent<HTMLOListElement>) => {
-      isKeyboardFocusRef.current = false;
-
-      if (event.target instanceof Element && event.target.closest("[data-showcase-index]")) {
-        return;
-      }
-
-      const nextItemIndex = resolveItemIndexAtPoint(event.clientX, event.clientY);
-
-      if (nextItemIndex === null || nextItemIndex < 0) {
-        return;
-      }
-
-      activateItem(nextItemIndex);
-    },
-    [activateItem, resolveItemIndexAtPoint],
-  );
-
   return {
     activeItem,
     artifactRef,
-    handleItemListClick,
+    handleItemListPointerLeave,
+    handleItemListPointerMove,
+    handleSelectedPanelPointerEnter,
     handleWorkbenchBlur,
     handleWorkbenchFocus,
     handleWorkbenchKeyDown,
+    handleWorkbenchPointerCancel: releaseTouchPointer,
+    handleWorkbenchPointerDown,
     handleWorkbenchPointerEnter,
     handleWorkbenchPointerLeave,
     handleWorkbenchPointerMove,
+    handleWorkbenchPointerUp: releaseTouchPointer,
     isWorkbenchEngaged,
     isWorkbenchTracking,
     listRef,

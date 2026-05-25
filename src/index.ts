@@ -6,6 +6,7 @@ export type {
   ShowcaseHeroItem,
   ShowcaseHeroItemDestination,
   ShowcaseHeroItemDetail,
+  ShowcaseHeroMotion,
   ShowcaseHeroOrbitTile,
   ShowcaseHeroProps,
   ShowcaseHeroWorkbench,

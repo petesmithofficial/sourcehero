@@ -1,433 +1,437 @@
-import { jsxs as m, jsx as n } from "react/jsx-runtime";
-import { useState as z, useRef as w, useMemo as J, useCallback as h, useEffect as O } from "react";
-const _ = {
+import { jsxs as h, jsx as n } from "react/jsx-runtime";
+import { useState as B, useRef as v, useMemo as K, useCallback as s, useEffect as C } from "react";
+const Q = {
   line: 1,
   page: 2
-}, ue = 18, he = 0.26, me = 0.35;
-function fe(r, a) {
-  return Math.min(Math.max(r, 0), a);
+}, fe = 18, we = 0.26, be = 0.35, ye = 13, J = 16, ge = 0.72, ve = 18, Ne = 16, Pe = J * 0.5;
+function ke(t, r) {
+  return Math.min(Math.max(t, 0), r);
 }
-function we(r, a) {
-  return r.deltaMode === _.line ? r.deltaY * ue : r.deltaMode === _.page ? r.deltaY * a.clientHeight : r.deltaY;
+function Ie(t) {
+  const r = t == null ? void 0 : t.maxTiltDegrees;
+  return typeof r != "number" || !Number.isFinite(r) || r <= 0 ? 1 : r / Pe;
 }
-function pe(r) {
-  var G;
-  const [a, o] = z(((G = r[0]) == null ? void 0 : G.name) ?? ""), [p, u] = z(null), [b, s] = z(!1), [R, i] = z(!1), f = w(null), g = w(null), P = w(null), v = w(null), x = w(0), M = w(null), F = w(null), W = w(null), C = w(null), A = w(!1), I = w(!1), y = w([]), T = J(
-    () => Math.max(0, r.findIndex((e) => e.name === a)),
-    [a, r]
-  ), te = J(
-    () => r.find((e) => e.name === a) ?? r[0],
-    [a, r]
-  ), S = h((e) => {
-    C.current !== e && (C.current = e, u(e));
-  }, []), H = h(() => {
+function Te(t) {
+  if (!(t instanceof Element))
+    return null;
+  const r = t.closest("[data-showcase-index]"), a = r == null ? void 0 : r.dataset.showcaseIndex;
+  if (!a)
+    return null;
+  const m = Number.parseInt(a, 10);
+  return Number.isNaN(m) ? null : m;
+}
+function We(t, r) {
+  return t.deltaMode === Q.line ? t.deltaY * fe : t.deltaMode === Q.page ? t.deltaY * r.clientHeight : t.deltaY;
+}
+function Me(t, r) {
+  var O;
+  const [a, m] = B(((O = t[0]) == null ? void 0 : O.name) ?? ""), [c, y] = B(null), [u, p] = B(!1), [l, b] = B(!1), N = v(null), L = v(null), M = v(null), g = v(null), x = v(0), D = v(null), X = v(null), E = v(!1), W = v(!1), S = v(null), $ = v([]), A = K(
+    () => Math.max(0, t.findIndex((e) => e.name === a)),
+    [a, t]
+  ), H = K(
+    () => t.find((e) => e.name === a) ?? t[0],
+    [a, t]
+  ), R = K(() => Ie(r), [r]), f = s((e) => {
+    X.current !== e && (X.current = e, y(e));
+  }, []), P = s(() => {
     var e;
-    v.current !== null && (window.cancelAnimationFrame(v.current), v.current = null), x.current = ((e = g.current) == null ? void 0 : e.scrollTop) ?? 0;
-  }, []), L = h(
-    (e, t = !1) => {
-      var c, d, N;
-      const l = r[e];
-      l && (o(l.name), S(null), t && (H(), (c = y.current[e]) == null || c.scrollIntoView({ block: "nearest", behavior: "auto" }), x.current = ((d = g.current) == null ? void 0 : d.scrollTop) ?? 0, (N = y.current[e]) == null || N.focus({ preventScroll: !0 })));
+    g.current !== null && (window.cancelAnimationFrame(g.current), g.current = null), x.current = ((e = L.current) == null ? void 0 : e.scrollTop) ?? 0;
+  }, []), k = s(
+    (e, o = !1) => {
+      var i, w, F;
+      const d = t[e];
+      d && (m(d.name), f(null), o && (P(), (i = $.current[e]) == null || i.scrollIntoView({ block: "nearest", behavior: "auto" }), x.current = ((w = L.current) == null ? void 0 : w.scrollTop) ?? 0, (F = $.current[e]) == null || F.focus({ preventScroll: !0 })));
     },
-    [H, S, r]
-  ), U = h(() => {
-    const e = g.current;
+    [P, f, t]
+  ), j = s(() => {
+    const e = L.current;
     if (!e) {
-      v.current = null;
+      g.current = null;
       return;
     }
-    const t = x.current - e.scrollTop;
-    if (Math.abs(t) <= me) {
-      e.scrollTop = x.current, v.current = null;
+    const o = x.current - e.scrollTop;
+    if (Math.abs(o) <= be) {
+      e.scrollTop = x.current, g.current = null;
       return;
     }
-    e.scrollTop += t * he, v.current = window.requestAnimationFrame(U);
-  }, []), Q = h((e) => {
-    const t = g.current;
-    if (!t)
+    e.scrollTop += o * we, g.current = window.requestAnimationFrame(j);
+  }, []), U = s((e) => {
+    const o = L.current;
+    if (!o)
       return !1;
-    const l = t.scrollHeight - t.clientHeight;
-    if (l <= 0)
+    const d = o.scrollHeight - o.clientHeight;
+    if (d <= 0)
       return !1;
-    const c = v.current === null ? t.scrollTop : x.current, d = fe(c + we(e, t), l);
-    return x.current = d, A.current ? (t.scrollTop = d, !0) : (v.current === null && (v.current = window.requestAnimationFrame(U)), !0);
-  }, [U]);
-  O(() => {
-    const e = f.current;
+    const i = g.current === null ? o.scrollTop : x.current, w = ke(i + We(e, o), d);
+    return x.current = w, E.current ? (o.scrollTop = w, !0) : (g.current === null && (g.current = window.requestAnimationFrame(j)), !0);
+  }, [j]);
+  C(() => {
+    const e = N.current;
     if (!e)
       return;
-    const t = (l) => {
-      Q(l) && (l.preventDefault(), l.stopPropagation());
+    const o = (d) => {
+      U(d) && (d.preventDefault(), d.stopPropagation());
     };
-    return e.addEventListener("wheel", t, { passive: !1 }), () => {
-      e.removeEventListener("wheel", t);
+    return e.addEventListener("wheel", o, { passive: !1 }), () => {
+      e.removeEventListener("wheel", o);
     };
-  }, [Q]);
-  const D = h(() => {
-    W.current !== null && (window.cancelAnimationFrame(W.current), W.current = null), F.current = null;
-  }, []), $ = h(() => {
-    P.current !== null && (window.cancelAnimationFrame(P.current), P.current = null), M.current = null;
-    const e = f.current;
-    e && (e.style.removeProperty("--workbench-rotate-x"), e.style.removeProperty("--workbench-rotate-y"), e.style.removeProperty("--workbench-rotate-z"), e.style.removeProperty("--workbench-shift-x"), e.style.removeProperty("--workbench-shift-y"));
-  }, []), X = h((e, t) => {
-    if (A.current) {
-      $();
+  }, [U]);
+  const I = s(() => {
+    M.current !== null && (window.cancelAnimationFrame(M.current), M.current = null), D.current = null;
+    const e = N.current;
+    e && (e.style.removeProperty("--workbench-rotate-x"), e.style.removeProperty("--workbench-rotate-y"), e.style.removeProperty("--workbench-rotate-z"), e.style.removeProperty("--workbench-shift-x"), e.style.removeProperty("--workbench-shift-y"), e.style.removeProperty("--workbench-origin-x"), e.style.removeProperty("--workbench-origin-y"));
+  }, []), q = s((e, o, d) => {
+    if (E.current) {
+      I();
       return;
     }
-    M.current = { clientX: e, clientY: t }, P.current === null && (P.current = window.requestAnimationFrame(() => {
-      const l = f.current, c = M.current;
-      if (P.current = null, M.current = null, !l || !c)
+    D.current = { clientX: e, clientY: o, pointerType: d }, M.current === null && (M.current = window.requestAnimationFrame(() => {
+      const i = N.current, w = D.current;
+      if (M.current = null, D.current = null, !i || !w)
         return;
-      const d = c.clientX / window.innerWidth - 0.5, N = c.clientY / window.innerHeight - 0.5, K = -N * 13, k = d * 16, E = d * 0.72, B = d * 18, q = N * 16;
-      l.style.setProperty("--workbench-rotate-x", `${K.toFixed(2)}deg`), l.style.setProperty("--workbench-rotate-y", `${k.toFixed(2)}deg`), l.style.setProperty("--workbench-rotate-z", `${E.toFixed(2)}deg`), l.style.setProperty("--workbench-shift-x", `${B.toFixed(2)}px`), l.style.setProperty("--workbench-shift-y", `${q.toFixed(2)}px`);
+      const F = w.clientX / window.innerWidth - 0.5, Z = w.clientY / window.innerHeight - 0.5, Y = w.pointerType === "touch" ? 0.86 : 1, de = -Z * ye * Y * R, ue = F * J * Y * R, he = F * ge * Y * R, me = F * ve * Y, pe = Z * Ne * Y;
+      i.style.setProperty("--workbench-rotate-x", `${de.toFixed(2)}deg`), i.style.setProperty("--workbench-rotate-y", `${ue.toFixed(2)}deg`), i.style.setProperty("--workbench-rotate-z", `${he.toFixed(2)}deg`), i.style.setProperty("--workbench-shift-x", `${me.toFixed(2)}px`), i.style.setProperty("--workbench-shift-y", `${pe.toFixed(2)}px`);
     }));
-  }, [$]);
-  O(() => {
-    const e = window.matchMedia("(prefers-reduced-motion: reduce)"), t = () => {
-      A.current = e.matches, e.matches && $();
-    };
-    return t(), e.addEventListener("change", t), () => {
-      e.removeEventListener("change", t);
-    };
-  }, [$]), O(
-    () => () => {
-      D(), H(), $();
+  }, [R, I]), T = s(
+    (e, o, d) => {
+      if (E.current) {
+        b(!1), I();
+        return;
+      }
+      b(!0), q(e, o, d);
     },
-    [D, H, $]
+    [I, q]
   );
-  const re = h(
-    (e) => (t) => {
-      y.current[e] = t;
+  C(() => {
+    const e = window.matchMedia("(prefers-reduced-motion: reduce)"), o = () => {
+      E.current = e.matches, e.matches && I();
+    };
+    return o(), e.addEventListener("change", o), () => {
+      e.removeEventListener("change", o);
+    };
+  }, [I]), C(
+    () => () => {
+      P(), I();
+    },
+    [P, I]
+  );
+  const _ = s(
+    (e) => (o) => {
+      $.current[e] = o;
     },
     []
-  ), Z = h((e, t) => {
-    const l = f.current;
-    if (!l)
-      return !1;
-    const c = l.getBoundingClientRect(), d = 24;
-    return e >= c.left - d && e <= c.right + d && t >= c.top - d && t <= c.bottom + d;
-  }, []);
-  O(() => {
-    const e = (c) => {
-      ["ArrowDown", "ArrowUp", "End", "Home", "Tab"].includes(c.key) && (I.current = !0);
-    }, t = () => {
-      I.current = !1;
-    }, l = (c) => {
-      var d;
-      if (c.pointerType !== "touch") {
-        if (A.current) {
-          i(!1), s(Z(c.clientX, c.clientY));
+  );
+  C(() => {
+    const e = (i) => {
+      ["ArrowDown", "ArrowUp", "End", "Home", "Tab"].includes(i.key) && (W.current = !0);
+    }, o = () => {
+      W.current = !1;
+    }, d = (i) => {
+      var w;
+      if (!(i.pointerType === "touch" && S.current !== i.pointerId)) {
+        if (E.current) {
+          b(!1), I();
           return;
         }
-        if (I.current && ((d = f.current) != null && d.contains(document.activeElement))) {
-          s(!0);
-          return;
-        }
-        if (Z(c.clientX, c.clientY)) {
-          s(!0), i(!1);
-          return;
-        }
-        s(!1), i(!0), X(c.clientX, c.clientY);
+        W.current && ((w = N.current) != null && w.contains(document.activeElement)) && p(!0), T(i.clientX, i.clientY, i.pointerType);
       }
     };
-    return window.addEventListener("keydown", e, { passive: !0 }), window.addEventListener("pointerdown", t, { passive: !0 }), window.addEventListener("pointermove", l, { passive: !0 }), () => {
-      window.removeEventListener("keydown", e), window.removeEventListener("pointerdown", t), window.removeEventListener("pointermove", l);
+    return window.addEventListener("keydown", e, { passive: !0 }), window.addEventListener("pointerdown", o, { passive: !0 }), window.addEventListener("pointermove", d, { passive: !0 }), () => {
+      window.removeEventListener("keydown", e), window.removeEventListener("pointerdown", o), window.removeEventListener("pointermove", d);
     };
-  }, [Z, X]);
-  const Y = h(
-    (e, t) => {
-      const l = g.current, c = C.current;
-      if (!l)
-        return null;
-      const d = l.getBoundingClientRect(), N = 8;
-      if (e < d.left - N || e > d.right + N || t < d.top - N || t > d.bottom + N)
-        return null;
-      const K = y.current.findIndex((k) => {
-        if (!k)
-          return !1;
-        const E = k.getBoundingClientRect();
-        return t >= E.top && t <= E.bottom;
-      });
-      if (K >= 0)
-        return K;
-      if (c) {
-        const k = r.findIndex((B) => B.name === c), E = y.current[k];
-        if (E) {
-          const B = E.getBoundingClientRect(), q = 10;
-          if (t >= B.top - q && t <= B.bottom + q)
-            return k;
-        }
-      }
-      return c ? r.findIndex((k) => k.name === c) : null;
-    },
-    [r]
-  ), V = h(
-    (e, t) => {
-      var d;
-      const l = Y(e, t), c = l === null || l < 0 ? null : ((d = r[l]) == null ? void 0 : d.name) ?? null;
-      S(c);
-    },
-    [S, r, Y]
-  ), j = h(
-    (e, t) => {
-      F.current = { clientX: e, clientY: t }, W.current === null && (W.current = window.requestAnimationFrame(() => {
-        const l = F.current;
-        W.current = null, F.current = null, l && V(l.clientX, l.clientY);
-      }));
-    },
-    [V]
-  ), ae = h((e) => {
-    e.currentTarget.contains(e.relatedTarget) || (D(), I.current = !1, s(!1), S(null));
-  }, [D, S]), le = h(() => {
-    I.current && (s(!0), i(!1));
-  }, []), oe = h((e) => {
-    D(), s(!1), i(!0), X(e.clientX, e.clientY), S(null);
-  }, [D, S, X]), ce = h(
+  }, [I, T]);
+  const ee = s((e) => {
+    e.currentTarget.contains(e.relatedTarget) || (W.current = !1, p(!1), f(null));
+  }, [f]), ne = s(() => {
+    W.current && p(!0);
+  }, []), re = s((e) => {
+    p(!1), f(null), !(e.pointerType === "touch" && S.current !== e.pointerId) && T(e.clientX, e.clientY, e.pointerType);
+  }, [f, T]), te = s(
     (e) => {
-      e.pointerType !== "touch" && (s(!0), i(!1), j(e.clientX, e.clientY));
+      p(!0), T(e.clientX, e.clientY, e.pointerType);
     },
-    [j]
-  ), ie = h(
+    [T]
+  ), ae = s(
     (e) => {
-      e.pointerType !== "touch" && (s(!0), i(!1), j(e.clientX, e.clientY));
+      W.current = !1, p(!0), e.pointerType === "touch" && (S.current = e.pointerId), T(e.clientX, e.clientY, e.pointerType);
     },
-    [j]
-  ), se = h(
+    [T]
+  ), z = s((e) => {
+    e.pointerType === "touch" && S.current === e.pointerId && (S.current = null, b(!1));
+  }, []), oe = s(
     (e) => {
-      I.current = !0, s(!0), i(!1), e.key === "ArrowDown" && (e.preventDefault(), L(Math.min(T + 1, r.length - 1), !0)), e.key === "ArrowUp" && (e.preventDefault(), L(Math.max(T - 1, 0), !0)), e.key === "Home" && (e.preventDefault(), L(0, !0)), e.key === "End" && (e.preventDefault(), L(r.length - 1, !0));
-    },
-    [L, T, r.length]
-  ), de = h(
-    (e) => {
-      if (I.current = !1, e.target instanceof Element && e.target.closest("[data-showcase-index]"))
+      var i;
+      if (e.pointerType === "touch")
         return;
-      const t = Y(e.clientX, e.clientY);
-      t === null || t < 0 || L(t);
+      const o = Te(e.target), d = o === null ? null : ((i = t[o]) == null ? void 0 : i.name) ?? null;
+      f(d);
     },
-    [L, Y]
+    [t, f]
+  ), le = s(
+    (e) => {
+      e.pointerType !== "touch" && f(null);
+    },
+    [f]
+  ), ie = s(
+    (e) => {
+      e.pointerType !== "touch" && f(null);
+    },
+    [f]
+  ), ce = s(
+    (e) => {
+      e.pointerType === "touch" && S.current !== e.pointerId || (p(!0), T(e.clientX, e.clientY, e.pointerType));
+    },
+    [T]
+  ), se = s(
+    (e) => {
+      W.current = !0, p(!0), e.key === "ArrowDown" && (e.preventDefault(), k(Math.min(A + 1, t.length - 1), !0)), e.key === "ArrowUp" && (e.preventDefault(), k(Math.max(A - 1, 0), !0)), e.key === "Home" && (e.preventDefault(), k(0, !0)), e.key === "End" && (e.preventDefault(), k(t.length - 1, !0));
+    },
+    [k, A, t.length]
   );
   return {
-    activeItem: te,
-    artifactRef: f,
-    handleItemListClick: de,
-    handleWorkbenchBlur: ae,
-    handleWorkbenchFocus: le,
+    activeItem: H,
+    artifactRef: N,
+    handleItemListPointerLeave: le,
+    handleItemListPointerMove: oe,
+    handleSelectedPanelPointerEnter: ie,
+    handleWorkbenchBlur: ee,
+    handleWorkbenchFocus: ne,
     handleWorkbenchKeyDown: se,
-    handleWorkbenchPointerEnter: ce,
-    handleWorkbenchPointerLeave: oe,
-    handleWorkbenchPointerMove: ie,
-    isWorkbenchEngaged: b,
-    isWorkbenchTracking: R,
-    listRef: g,
-    previewedItemName: p,
-    registerRow: re,
-    selectItem: L
+    handleWorkbenchPointerCancel: z,
+    handleWorkbenchPointerDown: ae,
+    handleWorkbenchPointerEnter: te,
+    handleWorkbenchPointerLeave: re,
+    handleWorkbenchPointerMove: ce,
+    handleWorkbenchPointerUp: z,
+    isWorkbenchEngaged: u,
+    isWorkbenchTracking: l,
+    listRef: L,
+    previewedItemName: c,
+    registerRow: _,
+    selectItem: k
   };
 }
-function ee({ className: r = "showcase-detail", id: a, item: o }) {
-  var b;
-  const p = `${a}-title`, u = o.metadata ?? ((b = o.destination) != null && b.type ? [o.destination.type] : []);
-  return /* @__PURE__ */ m("div", { "aria-labelledby": p, "aria-live": "polite", className: r, id: a, role: "region", children: [
-    /* @__PURE__ */ n("h2", { className: "showcase-detail-title", id: p, children: o.name }),
-    u.length > 0 ? /* @__PURE__ */ n("div", { className: "showcase-detail-meta", "aria-label": `${o.name} metadata`, children: u.map((s) => /* @__PURE__ */ n("span", { children: s }, s)) }) : null,
-    o.details && o.details.length > 0 ? /* @__PURE__ */ n("dl", { className: "showcase-detail-evidence", children: o.details.map((s) => /* @__PURE__ */ m("div", { children: [
-      /* @__PURE__ */ n("dt", { children: s.label }),
-      /* @__PURE__ */ n("dd", { children: s.value })
-    ] }, s.label)) }) : null,
-    /* @__PURE__ */ n("span", { className: "showcase-detail-signal", children: o.signal }),
-    o.destination ? /* @__PURE__ */ n(
+function V({ className: t = "showcase-detail", id: r, item: a }) {
+  var y;
+  const m = `${r}-title`, c = a.metadata ?? ((y = a.destination) != null && y.type ? [a.destination.type] : []);
+  return /* @__PURE__ */ h("div", { "aria-labelledby": m, "aria-live": "polite", className: t, id: r, role: "region", children: [
+    /* @__PURE__ */ n("h2", { className: "showcase-detail-title", id: m, children: a.name }),
+    c.length > 0 ? /* @__PURE__ */ n("div", { className: "showcase-detail-meta", "aria-label": `${a.name} metadata`, children: c.map((u) => /* @__PURE__ */ n("span", { children: u }, u)) }) : null,
+    a.details && a.details.length > 0 ? /* @__PURE__ */ n("dl", { className: "showcase-detail-evidence", children: a.details.map((u) => /* @__PURE__ */ h("div", { children: [
+      /* @__PURE__ */ n("dt", { children: u.label }),
+      /* @__PURE__ */ n("dd", { children: u.value })
+    ] }, u.label)) }) : null,
+    /* @__PURE__ */ n("span", { className: "showcase-detail-signal", children: a.signal }),
+    a.destination ? /* @__PURE__ */ n(
       "a",
       {
-        "aria-label": o.destination.ariaLabel,
+        "aria-label": a.destination.ariaLabel,
         className: "showcase-detail-action",
-        href: o.destination.href,
-        rel: o.destination.rel,
-        target: o.destination.target,
-        children: o.destination.label
+        href: a.destination.href,
+        rel: a.destination.rel,
+        target: a.destination.target,
+        children: a.destination.label
       }
     ) : null
   ] });
 }
-function be({ tags: r }) {
-  return /* @__PURE__ */ n("div", { className: "metric-strip", "aria-hidden": "true", children: r.map((a) => /* @__PURE__ */ n("span", { children: a }, a)) });
+function xe({ tags: t }) {
+  return /* @__PURE__ */ n("div", { className: "metric-strip", "aria-hidden": "true", children: t.map((r) => /* @__PURE__ */ n("span", { children: r }, r)) });
 }
-function ge({
-  controlsId: r,
-  index: a,
-  isActive: o,
-  isPreviewed: p,
-  item: u,
-  onActivate: b,
-  setRef: s
+function Se({
+  controlsId: t,
+  index: r,
+  isActive: a,
+  isPreviewed: m,
+  item: c,
+  onActivate: y,
+  setRef: u
 }) {
-  var f, g;
-  const R = ["workbench-row", o ? "is-active" : "", p ? "is-previewed" : ""].filter(Boolean).join(" "), i = `${u.slug}-summary`;
-  return /* @__PURE__ */ m(
+  var b, N;
+  const p = ["workbench-row", a ? "is-active" : "", m ? "is-previewed" : ""].filter(Boolean).join(" "), l = `${c.slug}-summary`;
+  return /* @__PURE__ */ h(
     "button",
     {
-      "aria-controls": r,
-      "aria-describedby": i,
-      "aria-pressed": o,
-      className: R,
-      "data-showcase-index": a,
-      id: `showcase-${u.slug}`,
-      onClick: b,
-      ref: s,
+      "aria-controls": t,
+      "aria-describedby": l,
+      "aria-pressed": a,
+      className: p,
+      "data-showcase-index": r,
+      id: `showcase-${c.slug}`,
+      onClick: y,
+      ref: u,
       type: "button",
       children: [
-        /* @__PURE__ */ n("span", { className: "workbench-index", children: String(a + 1).padStart(2, "0") }),
-        /* @__PURE__ */ m("div", { children: [
-          /* @__PURE__ */ n("strong", { children: u.name }),
-          /* @__PURE__ */ n("p", { children: u.summary }),
-          /* @__PURE__ */ n("small", { id: i, children: ((g = (f = u.details) == null ? void 0 : f[0]) == null ? void 0 : g.value) ?? u.summary })
+        /* @__PURE__ */ n("span", { className: "workbench-index", children: String(r + 1).padStart(2, "0") }),
+        /* @__PURE__ */ h("div", { children: [
+          /* @__PURE__ */ n("strong", { children: c.name }),
+          /* @__PURE__ */ n("p", { children: c.summary }),
+          /* @__PURE__ */ n("small", { id: l, children: ((N = (b = c.details) == null ? void 0 : b[0]) == null ? void 0 : N.value) ?? c.summary })
         ] }),
-        /* @__PURE__ */ n("em", { children: u.signal })
+        /* @__PURE__ */ n("em", { children: c.signal })
       ]
     }
   );
 }
-function ne({ title: r }) {
-  return /* @__PURE__ */ m("div", { className: "window-bar", children: [
+function G({ title: t }) {
+  return /* @__PURE__ */ h("div", { className: "window-bar", children: [
     /* @__PURE__ */ n("span", {}),
     /* @__PURE__ */ n("span", {}),
     /* @__PURE__ */ n("span", {}),
-    /* @__PURE__ */ n("strong", { children: r })
+    /* @__PURE__ */ n("strong", { children: t })
   ] });
 }
-function ve({ id: r, workbench: a }) {
-  const o = "selected-showcase-item", p = "selected-showcase-item-inline", {
-    activeItem: u,
-    artifactRef: b,
-    handleItemListClick: s,
-    handleWorkbenchBlur: R,
-    handleWorkbenchFocus: i,
-    handleWorkbenchKeyDown: f,
-    handleWorkbenchPointerEnter: g,
-    handleWorkbenchPointerLeave: P,
-    handleWorkbenchPointerMove: v,
-    isWorkbenchEngaged: x,
-    isWorkbenchTracking: M,
-    listRef: F,
-    previewedItemName: W,
-    registerRow: C,
-    selectItem: A
-  } = pe(a.items), I = [
+function Le({ id: t, workbench: r }) {
+  const a = "selected-showcase-item", m = "selected-showcase-item-inline", {
+    activeItem: c,
+    artifactRef: y,
+    handleItemListPointerLeave: u,
+    handleItemListPointerMove: p,
+    handleSelectedPanelPointerEnter: l,
+    handleWorkbenchBlur: b,
+    handleWorkbenchFocus: N,
+    handleWorkbenchKeyDown: L,
+    handleWorkbenchPointerCancel: M,
+    handleWorkbenchPointerDown: g,
+    handleWorkbenchPointerEnter: x,
+    handleWorkbenchPointerLeave: D,
+    handleWorkbenchPointerMove: X,
+    handleWorkbenchPointerUp: E,
+    isWorkbenchEngaged: W,
+    isWorkbenchTracking: S,
+    listRef: $,
+    previewedItemName: A,
+    registerRow: H,
+    selectItem: R
+  } = Me(r.items, r.motion), f = [
     "hero-art",
-    x ? "is-workbench-engaged" : "",
-    M ? "is-workbench-tracking" : ""
+    W ? "is-workbench-engaged" : "",
+    S ? "is-workbench-tracking" : ""
   ].filter(Boolean).join(" ");
-  return u ? /* @__PURE__ */ n(
+  return c ? /* @__PURE__ */ n(
     "div",
     {
-      className: I,
-      id: r,
-      "aria-label": a.ariaLabel ?? "Showcase index",
-      onBlur: R,
-      onFocus: i,
-      onPointerEnter: g,
-      onPointerLeave: P,
-      onPointerMove: v,
-      ref: b,
-      children: /* @__PURE__ */ m("div", { className: "hero-art-stage", children: [
-        /* @__PURE__ */ m("div", { className: "artifact-window artifact-window-main", onKeyDown: f, children: [
-          /* @__PURE__ */ n(ne, { title: a.title }),
-          /* @__PURE__ */ m("div", { className: "workbench-panel", children: [
-            /* @__PURE__ */ m("div", { className: "workbench-summary", children: [
-              /* @__PURE__ */ n("span", { children: a.eyebrow ?? "showcase index" }),
-              /* @__PURE__ */ n("strong", { children: a.caption })
+      className: f,
+      id: t,
+      "aria-label": r.ariaLabel ?? "Showcase index",
+      onBlur: b,
+      onFocus: N,
+      onPointerCancel: M,
+      onPointerDown: g,
+      onPointerEnter: x,
+      onPointerLeave: D,
+      onPointerMove: X,
+      onPointerUp: E,
+      ref: y,
+      children: /* @__PURE__ */ n("div", { className: "hero-art-stage", children: /* @__PURE__ */ h("div", { className: "hero-art-motion-layer", children: [
+        /* @__PURE__ */ h("div", { className: "artifact-window artifact-window-main", onKeyDown: L, children: [
+          /* @__PURE__ */ n(G, { title: r.title }),
+          /* @__PURE__ */ h("div", { className: "workbench-panel", children: [
+            /* @__PURE__ */ h("div", { className: "workbench-summary", children: [
+              /* @__PURE__ */ n("span", { children: r.eyebrow ?? "showcase index" }),
+              /* @__PURE__ */ n("strong", { children: r.caption })
             ] }),
             /* @__PURE__ */ n(
               "ol",
               {
-                "aria-label": a.listLabel ?? "Selectable showcase items",
+                "aria-label": r.listLabel ?? "Selectable showcase items",
                 className: "workbench-list",
-                onClick: s,
-                ref: F,
-                children: a.items.map((y, T) => /* @__PURE__ */ n("li", { className: "workbench-item", children: /* @__PURE__ */ n(
-                  ge,
+                onPointerLeave: u,
+                onPointerMove: p,
+                ref: $,
+                children: r.items.map((P, k) => /* @__PURE__ */ n("li", { className: "workbench-item", children: /* @__PURE__ */ n(
+                  Se,
                   {
-                    controlsId: `${o} ${p}`,
-                    index: T,
-                    isActive: y.name === u.name,
-                    isPreviewed: y.name === W && y.name !== u.name,
-                    item: y,
-                    onActivate: () => A(T),
-                    setRef: C(T)
+                    controlsId: `${a} ${m}`,
+                    index: k,
+                    isActive: P.name === c.name,
+                    isPreviewed: P.name === A && P.name !== c.name,
+                    item: P,
+                    onActivate: () => R(k),
+                    setRef: H(k)
                   }
-                ) }, y.name))
+                ) }, P.name))
               }
             ),
-            /* @__PURE__ */ m("div", { className: "mobile-showcase-panel", children: [
-              /* @__PURE__ */ n("div", { className: "mini-heading", children: a.selectedLabel ?? "selected item" }),
+            /* @__PURE__ */ h("div", { className: "mobile-showcase-panel", children: [
+              /* @__PURE__ */ n("div", { className: "mini-heading", children: r.selectedLabel ?? "selected item" }),
               /* @__PURE__ */ n(
-                ee,
+                V,
                 {
                   className: "showcase-detail showcase-detail-inline",
-                  id: p,
-                  item: u
+                  id: m,
+                  item: c
                 }
               )
             ] })
           ] })
         ] }),
-        /* @__PURE__ */ m("div", { className: "artifact-window artifact-window-side", children: [
-          /* @__PURE__ */ n("div", { className: "mini-heading", children: a.selectedLabel ?? "selected item" }),
-          /* @__PURE__ */ n(ee, { id: o, item: u })
-        ] }),
-        a.tags && a.tags.length > 0 ? /* @__PURE__ */ n(be, { tags: a.tags }) : null
-      ] })
+        /* @__PURE__ */ h(
+          "div",
+          {
+            className: "artifact-window artifact-window-side",
+            onPointerEnter: l,
+            onPointerMove: l,
+            children: [
+              /* @__PURE__ */ n("div", { className: "mini-heading", children: r.selectedLabel ?? "selected item" }),
+              /* @__PURE__ */ n(V, { id: a, item: c })
+            ]
+          }
+        ),
+        r.tags && r.tags.length > 0 ? /* @__PURE__ */ n(xe, { tags: r.tags }) : null
+      ] }) })
     }
-  ) : /* @__PURE__ */ n("div", { className: "hero-art", id: r, "aria-label": a.ariaLabel ?? "Showcase index", children: /* @__PURE__ */ n("div", { className: "hero-art-stage", children: /* @__PURE__ */ m("div", { className: "artifact-window artifact-window-main", children: [
-    /* @__PURE__ */ n(ne, { title: a.title }),
-    /* @__PURE__ */ n("div", { className: "workbench-panel", children: /* @__PURE__ */ m("div", { className: "workbench-summary", children: [
-      /* @__PURE__ */ n("span", { children: a.eyebrow ?? "showcase index" }),
-      /* @__PURE__ */ n("strong", { children: a.emptyState ?? a.caption })
+  ) : /* @__PURE__ */ n("div", { className: "hero-art", id: t, "aria-label": r.ariaLabel ?? "Showcase index", children: /* @__PURE__ */ n("div", { className: "hero-art-stage", children: /* @__PURE__ */ n("div", { className: "hero-art-motion-layer", children: /* @__PURE__ */ h("div", { className: "artifact-window artifact-window-main", children: [
+    /* @__PURE__ */ n(G, { title: r.title }),
+    /* @__PURE__ */ n("div", { className: "workbench-panel", children: /* @__PURE__ */ h("div", { className: "workbench-summary", children: [
+      /* @__PURE__ */ n("span", { children: r.eyebrow ?? "showcase index" }),
+      /* @__PURE__ */ n("strong", { children: r.emptyState ?? r.caption })
     ] }) })
-  ] }) }) });
+  ] }) }) }) });
 }
-const ye = "hero-title", Ne = "work";
-function Ie(r, a) {
-  return [r === "secondary" ? "secondary-action" : "primary-action", a].filter(Boolean).join(" ");
+const Ee = "hero-title", De = "work";
+function Re(t, r) {
+  return [t === "secondary" ? "secondary-action" : "primary-action", r].filter(Boolean).join(" ");
 }
-function ke(r, a) {
-  const o = `orbit-tile-${["one", "two", "three", "four"][a] ?? "one"}`;
-  return ["orbit-tile", r ?? o].filter(Boolean).join(" ");
+function Fe(t, r) {
+  const a = `orbit-tile-${["one", "two", "three", "four"][r] ?? "one"}`;
+  return ["orbit-tile", t ?? a].filter(Boolean).join(" ");
 }
-function We({
-  actions: r = [],
-  className: a,
-  content: o,
-  id: p,
-  orbitTiles: u = [],
-  titleId: b = ye,
-  workbench: s
+function Ye({
+  actions: t = [],
+  className: r,
+  content: a,
+  id: m,
+  orbitTiles: c = [],
+  titleId: y = Ee,
+  workbench: u
 }) {
-  const R = ["showcase-hero", "hero", a].filter(Boolean).join(" ");
-  return /* @__PURE__ */ m("section", { className: R, id: p, "aria-labelledby": b, children: [
+  const p = ["showcase-hero", "hero", r].filter(Boolean).join(" ");
+  return /* @__PURE__ */ h("section", { className: p, id: m, "aria-labelledby": y, children: [
     /* @__PURE__ */ n("div", { className: "hero-noise", "aria-hidden": "true" }),
     /* @__PURE__ */ n("div", { className: "hero-grid", "aria-hidden": "true" }),
-    u.length > 0 ? /* @__PURE__ */ n("div", { className: "hero-orbit", "aria-hidden": "true", children: u.map((i, f) => /* @__PURE__ */ n("span", { className: ke(i.className, f), children: i.label }, `${i.className ?? f}-${i.label}`)) }) : null,
-    /* @__PURE__ */ m("div", { className: "hero-copy", children: [
-      /* @__PURE__ */ n("p", { className: "eyebrow", children: o.eyebrow }),
-      /* @__PURE__ */ n("h1", { id: b, children: o.name }),
-      /* @__PURE__ */ n("p", { className: "hero-statement", children: o.statement }),
-      /* @__PURE__ */ n("p", { className: "hero-detail", children: o.detail }),
-      r.length > 0 ? /* @__PURE__ */ n("div", { className: "hero-actions", "aria-label": "Primary actions", children: r.map((i) => /* @__PURE__ */ n(
+    c.length > 0 ? /* @__PURE__ */ n("div", { className: "hero-orbit", "aria-hidden": "true", children: c.map((l, b) => /* @__PURE__ */ n("span", { className: Fe(l.className, b), children: l.label }, `${l.className ?? b}-${l.label}`)) }) : null,
+    /* @__PURE__ */ h("div", { className: "hero-copy", children: [
+      /* @__PURE__ */ n("p", { className: "eyebrow", children: a.eyebrow }),
+      /* @__PURE__ */ n("h1", { id: y, children: a.name }),
+      /* @__PURE__ */ n("p", { className: "hero-statement", children: a.statement }),
+      /* @__PURE__ */ n("p", { className: "hero-detail", children: a.detail }),
+      t.length > 0 ? /* @__PURE__ */ n("div", { className: "hero-actions", "aria-label": "Primary actions", children: t.map((l) => /* @__PURE__ */ n(
         "a",
         {
-          "aria-label": i.ariaLabel,
-          className: Ie(i.variant, i.className),
-          href: i.href,
-          rel: i.rel,
-          target: i.target,
-          children: i.label
+          "aria-label": l.ariaLabel,
+          className: Re(l.variant, l.className),
+          href: l.href,
+          rel: l.rel,
+          target: l.target,
+          children: l.label
         },
-        `${i.href}-${i.label}`
+        `${l.href}-${l.label}`
       )) }) : null
     ] }),
-    s ? /* @__PURE__ */ n(ve, { id: s.id ?? Ne, workbench: s }) : null
+    u ? /* @__PURE__ */ n(Le, { id: u.id ?? De, workbench: u }) : null
   ] });
 }
 export {
-  We as ShowcaseHero
+  Ye as ShowcaseHero
 };
