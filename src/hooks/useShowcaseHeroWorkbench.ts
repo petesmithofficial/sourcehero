@@ -23,6 +23,8 @@ const defaultRotateZMultiplier = 0.72;
 const defaultShiftXMultiplier = 18;
 const defaultShiftYMultiplier = 16;
 const defaultMaxTiltDegrees = defaultRotateYMultiplier * 0.5;
+const defaultTouchReleaseHoldMs = 220;
+const defaultTouchReleaseDurationMs = 760;
 
 function clampScrollTop(nextScrollTop: number, maxScrollTop: number) {
   return Math.min(Math.max(nextScrollTop, 0), maxScrollTop);
@@ -36,6 +38,21 @@ function resolveMotionScale(motion: ShowcaseHeroMotion | undefined) {
   }
 
   return maxTiltDegrees / defaultMaxTiltDegrees;
+}
+
+function resolveDurationMs(value: number | undefined, fallback: number) {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    return fallback;
+  }
+
+  return value;
+}
+
+function resolveTouchReleaseReturn(motion: ShowcaseHeroMotion | undefined) {
+  return {
+    durationMs: resolveDurationMs(motion?.touchReleaseReturn?.durationMs, defaultTouchReleaseDurationMs),
+    holdMs: resolveDurationMs(motion?.touchReleaseReturn?.holdMs, defaultTouchReleaseHoldMs),
+  };
 }
 
 function getItemIndexFromTarget(target: EventTarget | null) {
@@ -72,10 +89,13 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
   const [previewedItemName, setPreviewedItemName] = useState<string | null>(null);
   const [isWorkbenchEngaged, setIsWorkbenchEngaged] = useState(false);
   const [isWorkbenchTracking, setIsWorkbenchTracking] = useState(false);
+  const [isWorkbenchSettling, setIsWorkbenchSettling] = useState(false);
   const artifactRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLOListElement>(null);
   const motionFrame = useRef<number | null>(null);
   const scrollFrame = useRef<number | null>(null);
+  const touchReleaseHoldTimer = useRef<number | null>(null);
+  const touchReleaseSettleTimer = useRef<number | null>(null);
   const targetScrollTop = useRef(0);
   const pendingMotionPoint = useRef<{ clientX: number; clientY: number; pointerType: string } | null>(null);
   const previewedItemNameRef = useRef<string | null>(null);
@@ -93,6 +113,7 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
     [activeItemName, items],
   );
   const motionScale = useMemo(() => resolveMotionScale(motion), [motion]);
+  const touchReleaseReturn = useMemo(() => resolveTouchReleaseReturn(motion), [motion]);
 
   const previewItem = useCallback((nextItemName: string | null) => {
     if (previewedItemNameRef.current === nextItemName) {
@@ -110,6 +131,18 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
     }
 
     targetScrollTop.current = listRef.current?.scrollTop ?? 0;
+  }, []);
+
+  const clearTouchReleaseTimers = useCallback(() => {
+    if (touchReleaseHoldTimer.current !== null) {
+      window.clearTimeout(touchReleaseHoldTimer.current);
+      touchReleaseHoldTimer.current = null;
+    }
+
+    if (touchReleaseSettleTimer.current !== null) {
+      window.clearTimeout(touchReleaseSettleTimer.current);
+      touchReleaseSettleTimer.current = null;
+    }
   }, []);
 
   const activateItem = useCallback(
@@ -272,15 +305,19 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
   const trackWorkbenchMotion = useCallback(
     (clientX: number, clientY: number, pointerType: string) => {
       if (prefersReducedMotionRef.current) {
+        clearTouchReleaseTimers();
+        setIsWorkbenchSettling(false);
         setIsWorkbenchTracking(false);
         resetWorkbenchMotion();
         return;
       }
 
+      clearTouchReleaseTimers();
+      setIsWorkbenchSettling(false);
       setIsWorkbenchTracking(true);
       setWorkbenchMotionTarget(clientX, clientY, pointerType);
     },
-    [resetWorkbenchMotion, setWorkbenchMotionTarget],
+    [clearTouchReleaseTimers, resetWorkbenchMotion, setWorkbenchMotionTarget],
   );
 
   useEffect(() => {
@@ -289,6 +326,8 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
       prefersReducedMotionRef.current = reducedMotionQuery.matches;
 
       if (reducedMotionQuery.matches) {
+        clearTouchReleaseTimers();
+        setIsWorkbenchSettling(false);
         resetWorkbenchMotion();
       }
     };
@@ -299,14 +338,15 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
     return () => {
       reducedMotionQuery.removeEventListener("change", syncReducedMotionPreference);
     };
-  }, [resetWorkbenchMotion]);
+  }, [clearTouchReleaseTimers, resetWorkbenchMotion]);
 
   useEffect(
     () => () => {
       cancelSmoothItemScroll();
+      clearTouchReleaseTimers();
       resetWorkbenchMotion();
     },
-    [cancelSmoothItemScroll, resetWorkbenchMotion],
+    [cancelSmoothItemScroll, clearTouchReleaseTimers, resetWorkbenchMotion],
   );
 
   const registerRow = useCallback(
@@ -333,6 +373,8 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
       }
 
       if (prefersReducedMotionRef.current) {
+        clearTouchReleaseTimers();
+        setIsWorkbenchSettling(false);
         setIsWorkbenchTracking(false);
         resetWorkbenchMotion();
         return;
@@ -354,7 +396,7 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
       window.removeEventListener("pointerdown", handleWindowPointerDown);
       window.removeEventListener("pointermove", handleWindowPointerMove);
     };
-  }, [resetWorkbenchMotion, trackWorkbenchMotion]);
+  }, [clearTouchReleaseTimers, resetWorkbenchMotion, trackWorkbenchMotion]);
 
   const handleWorkbenchBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
     if (!event.currentTarget.contains(event.relatedTarget)) {
@@ -405,10 +447,28 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
 
   const releaseTouchPointer = useCallback((event: PointerEvent<HTMLDivElement>) => {
     if (event.pointerType === "touch" && activeTouchPointerIdRef.current === event.pointerId) {
+      const artifact = artifactRef.current;
+
+      if (artifact) {
+        artifact.style.setProperty("--workbench-touch-return-ms", `${touchReleaseReturn.durationMs}ms`);
+      }
+
       activeTouchPointerIdRef.current = null;
       setIsWorkbenchTracking(false);
+      setIsWorkbenchSettling(true);
+
+      clearTouchReleaseTimers();
+      touchReleaseHoldTimer.current = window.setTimeout(() => {
+        touchReleaseHoldTimer.current = null;
+        resetWorkbenchMotion();
+
+        touchReleaseSettleTimer.current = window.setTimeout(() => {
+          touchReleaseSettleTimer.current = null;
+          setIsWorkbenchSettling(false);
+        }, touchReleaseReturn.durationMs);
+      }, touchReleaseReturn.holdMs);
     }
-  }, []);
+  }, [clearTouchReleaseTimers, resetWorkbenchMotion, touchReleaseReturn.durationMs, touchReleaseReturn.holdMs]);
 
   const handleItemListPointerMove = useCallback(
     (event: PointerEvent<HTMLOListElement>) => {
@@ -499,6 +559,7 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
     handleWorkbenchPointerMove,
     handleWorkbenchPointerUp: releaseTouchPointer,
     isWorkbenchEngaged,
+    isWorkbenchSettling,
     isWorkbenchTracking,
     listRef,
     previewedItemName,

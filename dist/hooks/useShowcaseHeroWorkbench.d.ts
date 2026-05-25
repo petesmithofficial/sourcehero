@@ -16,6 +16,7 @@ export declare function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroIte
     handleWorkbenchPointerMove: (event: PointerEvent<HTMLDivElement>) => void;
     handleWorkbenchPointerUp: (event: PointerEvent<HTMLDivElement>) => void;
     isWorkbenchEngaged: boolean;
+    isWorkbenchSettling: boolean;
     isWorkbenchTracking: boolean;
     listRef: import("react").RefObject<HTMLOListElement | null>;
     previewedItemName: string | null;

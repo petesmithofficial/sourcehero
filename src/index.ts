@@ -9,5 +9,6 @@ export type {
   ShowcaseHeroMotion,
   ShowcaseHeroOrbitTile,
   ShowcaseHeroProps,
+  ShowcaseHeroTouchReleaseReturn,
   ShowcaseHeroWorkbench,
 } from "./types.js";

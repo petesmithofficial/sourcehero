@@ -18,7 +18,7 @@ export const demoHeroProps: ShowcaseHeroProps = {
   content: {
     detail: "A prop-driven React hero for products, case studies, tools, writing, and technical demos.",
     eyebrow: "Reusable component",
-    name: "ShowcaseHero",
+    name: "Showcase Hero",
     statement: "Present selected work without locking it to one format.",
   },
   orbitTiles: [

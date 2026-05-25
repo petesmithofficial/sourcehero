@@ -29,6 +29,7 @@ export function ShowcaseWorkbench({ id, workbench }: ShowcaseWorkbenchProps) {
     handleWorkbenchPointerMove,
     handleWorkbenchPointerUp,
     isWorkbenchEngaged,
+    isWorkbenchSettling,
     isWorkbenchTracking,
     listRef,
     previewedItemName,
@@ -39,6 +40,7 @@ export function ShowcaseWorkbench({ id, workbench }: ShowcaseWorkbenchProps) {
     "hero-art",
     isWorkbenchEngaged ? "is-workbench-engaged" : "",
     isWorkbenchTracking ? "is-workbench-tracking" : "",
+    isWorkbenchSettling ? "is-workbench-settling" : "",
   ]
     .filter(Boolean)
     .join(" ");

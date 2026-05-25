@@ -277,6 +277,7 @@
   --workbench-shift-y: 0px;
   --workbench-origin-x: 50%;
   --workbench-origin-y: 46%;
+  --workbench-touch-return-ms: 760ms;
   position: relative;
   z-index: 2;
   width: min(72vw, 920px);
@@ -330,6 +331,12 @@
 .showcase-hero .hero-art.is-workbench-tracking .hero-art-stage {
   animation: none;
   transition-duration: 90ms;
+}
+
+.showcase-hero .hero-art.is-workbench-settling .hero-art-stage {
+  animation: none;
+  transition-duration: var(--workbench-touch-return-ms);
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .showcase-hero .artifact-window {
@@ -915,11 +922,12 @@
   }
 
   .showcase-hero h1 {
-    max-width: 6.8ch;
+    max-width: min(100%, 10.8ch);
     margin-inline: auto;
     font-size: clamp(3.35rem, 16vw, 4.8rem);
     line-height: 0.92;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
   .showcase-hero .hero-statement {
@@ -1027,7 +1035,7 @@
   }
 
   .showcase-hero h1 {
-    max-width: 6.4ch;
+    max-width: min(100%, 10.8ch);
     font-size: clamp(3rem, 14.8vw, 4.15rem);
   }
 

@@ -109,7 +109,7 @@ Each workbench item is intentionally neutral, so it can represent a case study, 
 
 ## Motion
 
-The workbench follows the pointer using viewport-based rotation and subtle translation. By default, the maximum Y-axis tilt is `8deg`.
+The workbench follows the pointer using viewport-based rotation and subtle translation. By default, the maximum Y-axis tilt is `8deg`. On touch devices, the workbench holds the final touch tilt for `220ms`, then eases back to its idle centered pose over `760ms`.
 
 Use `workbench.motion.maxTiltDegrees` to tune the rotation intensity. A value around `12` gives a stronger, more responsive follow effect; lower values such as `5` or `6` are calmer.
 
@@ -125,9 +125,35 @@ const hero: ShowcaseHeroProps = {
 };
 ```
 
-This option changes only the rotation amplitude. Pointer tracking, translation, hover behavior, touch behavior, and timing remain unchanged.
+Use `workbench.motion.touchReleaseReturn` to tune the mobile touch release behavior. Both values are optional; omitted or invalid values fall back to the defaults.
+
+```tsx
+const hero: ShowcaseHeroProps = {
+  content,
+  workbench: {
+    caption: "Selected work",
+    items,
+    motion: {
+      maxTiltDegrees: 12,
+      touchReleaseReturn: {
+        holdMs: 220,
+        durationMs: 760,
+      },
+    },
+    title: "workbench",
+  },
+};
+```
+
+| Motion field | Default | Description |
+| --- | --- | --- |
+| `maxTiltDegrees` | `8` | Maximum Y-axis tilt used to scale pointer-follow rotation. |
+| `touchReleaseReturn.holdMs` | `220` | How long a touch release keeps the final tilt before returning. |
+| `touchReleaseReturn.durationMs` | `760` | How long the touch release return animation takes. |
 
 The package owns the motion transform and hit-tested workbench layout. Consumer styles should not apply transforms, pointer-event changes, overflow changes, or z-index changes to internal motion classes such as `.hero-art-stage`, `.hero-art-motion-layer`, `.workbench-list`, or `.workbench-row`; those overrides can make visible rows drift away from their click targets. Prefer the root `className` prop and CSS custom properties for theming.
+
+The hero title is ordinary caller-provided text. Natural word breaks, such as `Showcase Hero`, produce cleaner mobile wrapping than long unbroken names such as `ShowcaseHero`; the stylesheet still includes emergency wrapping so narrow screens do not overflow.
 
 ## Styling
 
