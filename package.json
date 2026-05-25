@@ -3,15 +3,43 @@
   "version": "0.1.0",
   "description": "A customizable React showcase hero with an interactive item workbench.",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "private": false,
   "license": "MIT",
+  "keywords": [
+    "react",
+    "hero",
+    "showcase",
+    "portfolio",
+    "component"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/petesmithofficial/sourcehero.git"
+  },
+  "bugs": {
+    "url": "https://github.com/petesmithofficial/sourcehero/issues"
+  },
+  "homepage": "https://github.com/petesmithofficial/sourcehero#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "sideEffects": [
     "src/styles.css",
     "*.css"
   ],
   "files": [
     "dist",
-    "src",
+    "docs",
+    "src/components",
+    "src/hooks",
+    "src/ShowcaseHero.tsx",
+    "src/index.ts",
+    "src/styles.css",
+    "src/styles.css.d.ts",
+    "src/types.ts",
     "README.md"
   ],
   "exports": {
@@ -19,12 +47,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./styles.css": "./src/styles.css"
+    "./styles.css": {
+      "types": "./src/styles.css.d.ts",
+      "default": "./src/styles.css"
+    }
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 8788",
     "build": "vite build && tsc -p tsconfig.build.json",
     "preview": "vite preview --host 0.0.0.0 --port 8788",
+    "prepublishOnly": "npm run verify",
     "typecheck": "tsc --noEmit",
     "verify": "npm run typecheck && npm run build && node scripts/verify.mjs"
   },

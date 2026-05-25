@@ -9,7 +9,7 @@ The component is intentionally data-driven. It can present products, case studie
 ## Install
 
 ```sh
-npm install https://github.com/petesmithofficial/sourcehero/archive/main.tar.gz
+npm install @petesmithofficial/sourcehero
 ```
 
 ```tsx

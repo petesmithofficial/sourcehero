@@ -6,7 +6,9 @@ const root = path.resolve(new URL("..", import.meta.url).pathname);
 const requiredFiles = [
   "dist/index.js",
   "dist/index.d.ts",
+  "docs/showcasehero-preview.png",
   "src/ShowcaseHero.tsx",
+  "src/styles.css.d.ts",
   "src/styles.css",
   "src/demo/App.tsx",
   "src/demo/demo-data.ts",
@@ -62,6 +64,8 @@ for (const text of [
   "prefers-reduced-motion",
   "Selectable showcase items",
   "Open case study ->",
+  "npm install @petesmithofficial/sourcehero",
+  "workbench.motion.maxTiltDegrees",
 ]) {
   if (!source.includes(text)) {
     throw new Error(`Missing expected package contract text: ${text}`);
@@ -72,13 +76,31 @@ if (pkg.private !== false) {
   throw new Error("Package must be public-ready, not private.");
 }
 
-if (pkg.exports?.["./styles.css"] !== "./src/styles.css") {
+if (pkg.exports?.["./styles.css"]?.default !== "./src/styles.css") {
   throw new Error("Package must expose the component stylesheet.");
+}
+
+if (pkg.exports?.["./styles.css"]?.types !== "./src/styles.css.d.ts") {
+  throw new Error("Package must expose TypeScript declarations for the stylesheet export.");
+}
+
+if (pkg.publishConfig?.access !== "public") {
+  throw new Error("Scoped npm package must publish with public access.");
+}
+
+if (pkg.types !== "./dist/index.d.ts") {
+  throw new Error("Package must expose top-level TypeScript declarations.");
+}
+
+if (!pkg.files?.includes("docs")) {
+  throw new Error("Package must include docs assets referenced by README.");
 }
 
 for (const text of [
   "SourceHero",
   "source-hero",
+  "archive/main",
+  "tar.gz",
   "SourceHeroProps",
   "SourceHeroProject",
   "Public project index",
