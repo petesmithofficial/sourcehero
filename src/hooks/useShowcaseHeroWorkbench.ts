@@ -25,6 +25,30 @@ const defaultShiftYMultiplier = 16;
 const defaultMaxTiltDegrees = defaultRotateYMultiplier * 0.5;
 const defaultTouchReleaseHoldMs = 220;
 const defaultTouchReleaseDurationMs = 760;
+// Smooth coarse touch event streams while keeping pointer-follow movement responsive.
+const mouseFollowEase = 0.52;
+const touchFollowEase = 0.3;
+const motionSnapDelta = 0.04;
+
+type WorkbenchMotionState = {
+  pointerType: string;
+  rotateX: number;
+  rotateY: number;
+  rotateZ: number;
+  shiftX: number;
+  shiftY: number;
+};
+
+function createRestMotionState(pointerType: string): WorkbenchMotionState {
+  return {
+    pointerType,
+    rotateX: 0,
+    rotateY: 0,
+    rotateZ: 0,
+    shiftX: 0,
+    shiftY: 0,
+  };
+}
 
 function clampScrollTop(nextScrollTop: number, maxScrollTop: number) {
   return Math.min(Math.max(nextScrollTop, 0), maxScrollTop);
@@ -53,6 +77,37 @@ function resolveTouchReleaseReturn(motion: ShowcaseHeroMotion | undefined) {
     durationMs: resolveDurationMs(motion?.touchReleaseReturn?.durationMs, defaultTouchReleaseDurationMs),
     holdMs: resolveDurationMs(motion?.touchReleaseReturn?.holdMs, defaultTouchReleaseHoldMs),
   };
+}
+
+function applyWorkbenchMotion(artifact: HTMLDivElement, motion: WorkbenchMotionState) {
+  artifact.style.setProperty("--workbench-rotate-x", `${motion.rotateX.toFixed(2)}deg`);
+  artifact.style.setProperty("--workbench-rotate-y", `${motion.rotateY.toFixed(2)}deg`);
+  artifact.style.setProperty("--workbench-rotate-z", `${motion.rotateZ.toFixed(2)}deg`);
+  artifact.style.setProperty("--workbench-shift-x", `${motion.shiftX.toFixed(2)}px`);
+  artifact.style.setProperty("--workbench-shift-y", `${motion.shiftY.toFixed(2)}px`);
+}
+
+function interpolateMotion(current: WorkbenchMotionState, target: WorkbenchMotionState) {
+  const ease = target.pointerType === "touch" ? touchFollowEase : mouseFollowEase;
+
+  return {
+    pointerType: target.pointerType,
+    rotateX: current.rotateX + (target.rotateX - current.rotateX) * ease,
+    rotateY: current.rotateY + (target.rotateY - current.rotateY) * ease,
+    rotateZ: current.rotateZ + (target.rotateZ - current.rotateZ) * ease,
+    shiftX: current.shiftX + (target.shiftX - current.shiftX) * ease,
+    shiftY: current.shiftY + (target.shiftY - current.shiftY) * ease,
+  };
+}
+
+function getMotionDelta(current: WorkbenchMotionState, target: WorkbenchMotionState) {
+  return Math.max(
+    Math.abs(target.rotateX - current.rotateX),
+    Math.abs(target.rotateY - current.rotateY),
+    Math.abs(target.rotateZ - current.rotateZ),
+    Math.abs(target.shiftX - current.shiftX),
+    Math.abs(target.shiftY - current.shiftY),
+  );
 }
 
 function getItemIndexFromTarget(target: EventTarget | null) {
@@ -97,7 +152,8 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
   const touchReleaseHoldTimer = useRef<number | null>(null);
   const touchReleaseSettleTimer = useRef<number | null>(null);
   const targetScrollTop = useRef(0);
-  const pendingMotionPoint = useRef<{ clientX: number; clientY: number; pointerType: string } | null>(null);
+  const motionCurrent = useRef<WorkbenchMotionState | null>(null);
+  const motionTarget = useRef<WorkbenchMotionState | null>(null);
   const previewedItemNameRef = useRef<string | null>(null);
   const prefersReducedMotionRef = useRef(false);
   const isKeyboardFocusRef = useRef(false);
@@ -245,7 +301,8 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
       motionFrame.current = null;
     }
 
-    pendingMotionPoint.current = null;
+    motionCurrent.current = null;
+    motionTarget.current = null;
 
     const artifact = artifactRef.current;
 
@@ -262,45 +319,53 @@ export function useShowcaseHeroWorkbench(items: readonly ShowcaseHeroItem[], mot
     artifact.style.removeProperty("--workbench-origin-y");
   }, []);
 
+  const runWorkbenchMotionFrame = useCallback(() => {
+    const artifact = artifactRef.current;
+    const target = motionTarget.current;
+
+    if (!artifact || !target) {
+      motionFrame.current = null;
+      return;
+    }
+
+    const current = motionCurrent.current ?? createRestMotionState(target.pointerType);
+    const next = interpolateMotion(current, target);
+    const resolved = getMotionDelta(next, target) <= motionSnapDelta ? target : next;
+
+    motionCurrent.current = resolved;
+    applyWorkbenchMotion(artifact, resolved);
+
+    if (resolved === target) {
+      motionFrame.current = null;
+      return;
+    }
+
+    motionFrame.current = window.requestAnimationFrame(runWorkbenchMotionFrame);
+  }, []);
+
   const setWorkbenchMotionTarget = useCallback((clientX: number, clientY: number, pointerType: string) => {
     if (prefersReducedMotionRef.current) {
       resetWorkbenchMotion();
       return;
     }
 
-    pendingMotionPoint.current = { clientX, clientY, pointerType };
+    const x = clientX / window.innerWidth - 0.5;
+    const y = clientY / window.innerHeight - 0.5;
+    const pointerScale = pointerType === "touch" ? 0.86 : 1;
 
-    if (motionFrame.current !== null) {
-      return;
+    motionTarget.current = {
+      pointerType,
+      rotateX: -y * defaultRotateXMultiplier * pointerScale * motionScale,
+      rotateY: x * defaultRotateYMultiplier * pointerScale * motionScale,
+      rotateZ: x * defaultRotateZMultiplier * pointerScale * motionScale,
+      shiftX: x * defaultShiftXMultiplier * pointerScale,
+      shiftY: y * defaultShiftYMultiplier * pointerScale,
+    };
+
+    if (motionFrame.current === null) {
+      motionFrame.current = window.requestAnimationFrame(runWorkbenchMotionFrame);
     }
-
-    motionFrame.current = window.requestAnimationFrame(() => {
-      const artifact = artifactRef.current;
-      const point = pendingMotionPoint.current;
-
-      motionFrame.current = null;
-      pendingMotionPoint.current = null;
-
-      if (!artifact || !point) {
-        return;
-      }
-
-      const x = point.clientX / window.innerWidth - 0.5;
-      const y = point.clientY / window.innerHeight - 0.5;
-      const pointerScale = point.pointerType === "touch" ? 0.86 : 1;
-      const rotateX = -y * defaultRotateXMultiplier * pointerScale * motionScale;
-      const rotateY = x * defaultRotateYMultiplier * pointerScale * motionScale;
-      const rotateZ = x * defaultRotateZMultiplier * pointerScale * motionScale;
-      const shiftX = x * defaultShiftXMultiplier * pointerScale;
-      const shiftY = y * defaultShiftYMultiplier * pointerScale;
-
-      artifact.style.setProperty("--workbench-rotate-x", `${rotateX.toFixed(2)}deg`);
-      artifact.style.setProperty("--workbench-rotate-y", `${rotateY.toFixed(2)}deg`);
-      artifact.style.setProperty("--workbench-rotate-z", `${rotateZ.toFixed(2)}deg`);
-      artifact.style.setProperty("--workbench-shift-x", `${shiftX.toFixed(2)}px`);
-      artifact.style.setProperty("--workbench-shift-y", `${shiftY.toFixed(2)}px`);
-    });
-  }, [motionScale, resetWorkbenchMotion]);
+  }, [motionScale, resetWorkbenchMotion, runWorkbenchMotionFrame]);
 
   const trackWorkbenchMotion = useCallback(
     (clientX: number, clientY: number, pointerType: string) => {

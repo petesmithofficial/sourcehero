@@ -330,7 +330,7 @@
 
 .showcase-hero .hero-art.is-workbench-tracking .hero-art-stage {
   animation: none;
-  transition-duration: 90ms;
+  transition-duration: 0ms;
 }
 
 .showcase-hero .hero-art.is-workbench-settling .hero-art-stage {
